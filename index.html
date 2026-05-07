@@ -2,26 +2,23 @@
 <html>
 <head>
     <title>Umbrella Admin Notif</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
         await OneSignal.init({
           appId: "545e6d0a-cbe8-4b6e-82a6-7e43c5af32ac",
+          serviceWorkerPath: "OneSignalSDKWorker.js",
+          serviceWorkerParam: { scope: "/umbrella-notif/" }
         });
       });
     </script>
 </head>
 <body style="background:#0a0a0a; color:#fff; text-align:center; padding-top:50px; font-family:sans-serif;">
-    <h3 style="color:#8e44ad;">UMBRELLA ADMIN HUB</h3>
-    <p style="color:#888;">Klik tombol untuk menerima notifikasi real-time.</p>
-    
+    <h3>UMBRELLA ADMIN HUB</h3>
     <button onclick="OneSignal.SlidingBrowserPrompt.push({force:true})" 
-            style="padding:15px 30px; border-radius:30px; background:#8e44ad; color:#fff; border:none; font-weight:bold; cursor:pointer; box-shadow: 0 0 20px rgba(142, 68, 173, 0.4);">
+            style="padding:15px 30px; border-radius:10px; background:#8e44ad; color:#fff; border:none; cursor:pointer;">
         AKTIFKAN NOTIFIKASI
     </button>
-
-    <p style="font-size:12px; margin-top:20px; color:#555;">ID: 545e6d0a...32ac</p>
 </body>
 </html>
