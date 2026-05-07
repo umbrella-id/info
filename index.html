@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Umbrella Admin Notif</title>
+    <title>UMBRELLA ADMIN</title>
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -14,11 +14,10 @@
       });
     </script>
 </head>
-<body style="background:#0a0a0a; color:#fff; text-align:center; padding-top:50px; font-family:sans-serif;">
-    <h3>UMBRELLA ADMIN HUB</h3>
-    <button onclick="OneSignal.SlidingBrowserPrompt.push({force:true})" 
-            style="padding:15px 30px; border-radius:10px; background:#8e44ad; color:#fff; border:none; cursor:pointer;">
-        AKTIFKAN NOTIFIKASI
+<body style="background:#000; color:#fff; text-align:center; padding-top:100px; font-family:sans-serif;">
+    <h2>UMBRELLA ADMIN HUB</h2>
+    <button onclick="OneSignal.Notifications.requestPermission()" style="padding:20px; border-radius:10px; background:#8e44ad; color:#fff; border:none; cursor:pointer; font-weight:bold;">
+        AKTIFKAN NOTIFIKASI SEKARANG
     </button>
 </body>
 </html>
