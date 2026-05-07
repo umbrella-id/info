@@ -8,6 +8,8 @@
       OneSignalDeferred.push(async function(OneSignal) {
         await OneSignal.init({
           appId: "545e6d0a-cbe8-4b6e-82a6-7e43c5af32ac",
+          serviceWorkerPath: "OneSignalSDKWorker.js",
+          serviceWorkerParam: { scope: "/umbrella-notif/" }
         });
       });
     </script>
