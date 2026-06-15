@@ -1,6 +1,6 @@
 // ==================== KONFIGURASI ====================
 // Ganti dengan URL Apps Script Anda setelah deploy
-const API_BASE_URL = 'https://script.google.com/macros/s/REPLACE_THIS_WITH_YOUR_SCRIPT_ID/exec';
+const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbzzYiVd0aqzdzmohQnBfvZJRdnwyeSNb-75H_pO5Fxh2-S3aU111rdW8w9aQ0306MNR/exec';
 
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth() + 1;
