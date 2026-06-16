@@ -30,7 +30,7 @@ async function loadMonthly(tahun = currentYear, bulan = currentMonth) {
   const container = document.getElementById('monthlyContent');
   container.innerHTML = '<div class="loading">Memuat data...</div>';
   
-  const result = await callApi('getMonthlyTable', { tahun: tahun, bulan: bulan });
+  const result = await callApi('getMonthlyTable', { tahun: 2025, bulan: 12 });
   
   if (!result.success) {
     container.innerHTML = `<div class="error">❌ Error: ${result.error}</div>`;
