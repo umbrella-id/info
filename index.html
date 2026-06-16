@@ -8,10 +8,26 @@
 </head>
 <body>
 <div class="container">
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="monthly" onclick="switchTab('monthly')">📊 Bulanan</button>
+    <button class="tab-btn" data-tab="history" onclick="switchTab('history')">📋 History</button>
+  </div>
+
+  <!-- TAB BULANAN -->
   <div id="monthlyTab" class="card">
-    <div id="monthlyContent">
-      <div class="loading">Memuat data...</div>
+    <div id="monthlyContent"><div class="loading">Memuat data...</div></div>
+  </div>
+
+  <!-- TAB HISTORY -->
+  <div id="historyTab" class="card" style="display: none;">
+    <div class="history-filter">
+      <div class="filter-group">
+        <label>🔍 Cari IGN</label>
+        <input type="text" id="ignFilter" placeholder="Ketik nama..." onkeyup="loadHistory()">
+      </div>
     </div>
+    <div id="historyContent"><div class="loading">Memuat history...</div></div>
   </div>
 </div>
 
