@@ -3,42 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Kas Guild System</title>
+  <title>Kas Guild</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="container">
-  <div class="header">
-    <h1>Laporan Kas Guild</h1>
-    <p>💰 Kas mingguan | ✅ Centang = sudah bayar | Deposit = sisa saldo setelah lunas</p>
-  </div>
-  
-  <div class="filter-bar">
-    <div class="filter-group">
-      <label>📅 Tahun</label>
-      <select id="tahunFilter"></select>
-    </div>
-    <div class="filter-group">
-      <label>📆 Bulan</label>
-      <select id="bulanFilter"></select>
-    </div>
-    <div class="filter-group" id="ignFilterGroup" style="display: none;">
-      <label>🔍 Cari IGN</label>
-      <input type="text" id="ignFilter" placeholder="Ketik nama...">
-    </div>
-  </div>
-  
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="monthly">📊 Tabel Bulanan</button>
-    <button class="tab-btn" data-tab="history">📋 History Kas</button>
-  </div>
-  
   <div id="monthlyTab" class="card">
-    <div id="monthlyContent"><div class="loading">Memuat data...</div></div>
-  </div>
-  
-  <div id="historyTab" class="card" style="display: none;">
-    <div id="historyContent"><div class="loading">Memuat data...</div></div>
+    <div id="monthlyContent">
+      <div class="loading">Memuat data...</div>
+    </div>
   </div>
 </div>
 
