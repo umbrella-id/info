@@ -58,7 +58,7 @@ async function loadMonthly(tahun = currentYear, bulan = currentMonth) {
   }
   
   if (result.data.length === 0) {
-    container.innerHTML = '<div class="loading">✨ Tidak ada member aktif</div>';
+    container.innerHTML = '<div class="loading">✨ Tidak ada data untuk bulan ini</div>';
     return;
   }
   
@@ -121,7 +121,7 @@ async function loadHistory() {
   }
   
   let html = '<div class="scroll-hint">📋 ' + result.data.length + ' transaksi ditemukan</div>';
-  html += '<table class="history-table"><thead><tr>';
+  html += '<table><thead><tr>';
   html += '<th>Tanggal</th><th>IGN</th><th>Nominal</th><th>Keterangan</th><th>Bendahara</th>';
   html += '</tr></thead><tbody>';
   
