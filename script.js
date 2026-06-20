@@ -1,6 +1,7 @@
 // ==================== KONFIGURASI ====================
 const BASE_URL = 'https://script.google.com/macros/s/AKfycbzTP1-9KuQ2iz4ffTfhujqkSIQqQxXWMXY-BHljCVU_Zzm0Ept8j4AJUCBHqB-ZSZk/exec';
 const CACHE_KEY = 'kas_data';
+const CACHE_KEY_HISTORY = 'kas_history'; // Tambahan untuk cache history
 const CACHE_EXPIRY = 5 * 60 * 1000;
 const START_YEAR = 2025;
 const START_MONTH = 6;
@@ -45,6 +46,29 @@ function getCache(key) {
 function setCache(key, value) {
     try {
         localStorage.setItem(CACHE_KEY + '_' + key, JSON.stringify({
+            timestamp: Date.now(),
+            value: value
+        }));
+    } catch (e) { /* ignore */ }
+}
+
+// ==================== CACHE HISTORY ====================
+function getHistoryCache() {
+    try {
+        const raw = localStorage.getItem(CACHE_KEY_HISTORY);
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        if (Date.now() - data.timestamp > CACHE_EXPIRY) {
+            localStorage.removeItem(CACHE_KEY_HISTORY);
+            return null;
+        }
+        return data.value;
+    } catch (e) { return null; }
+}
+
+function setHistoryCache(value) {
+    try {
+        localStorage.setItem(CACHE_KEY_HISTORY, JSON.stringify({
             timestamp: Date.now(),
             value: value
         }));
@@ -300,7 +324,8 @@ function updateHeader(data) {
         $('totalKasHeader').textContent = formatSpina(data.saldoKas);
     }
     if (data.tarif) {
-        $('tarifHeader').textContent = Math.round(data.tarif).toLocaleString('id-ID');
+        // Tambahkan "S" pada tarif
+        $('tarifHeader').textContent = Math.round(data.tarif).toLocaleString('id-ID') + ' S';
     }
     if (data.bendahara && data.bendahara.length > 0) {
         let html = '';
@@ -315,6 +340,18 @@ function updateHeader(data) {
 
 // ==================== HISTORY ====================
 async function loadHistory() {
+    // Cek cache history dulu
+    const cachedHistory = getHistoryCache();
+    if (cachedHistory) {
+        console.log('✅ Load history dari cache');
+        allHistoryData = cachedHistory;
+        historyLoaded = true;
+        renderHistory(allHistoryData);
+        loadingHistory.style.display = 'none';
+        historyContainer.style.display = 'block';
+        return;
+    }
+
     loadingHistory.style.display = 'block';
     historyContainer.style.display = 'none';
     try {
@@ -324,6 +361,8 @@ async function loadHistory() {
         if (data.success && data.data) {
             allHistoryData = data.data;
             historyLoaded = true;
+            // Simpan ke cache
+            setHistoryCache(allHistoryData);
             renderHistory(allHistoryData);
         } else {
             historyBody.innerHTML =
@@ -476,25 +515,37 @@ async function loadData() {
         monthLabel.textContent = cached.bulanNama || (currentBulan + '/' + currentTahun);
         updateNavButtons();
         setTimeout(preloadPrevMonth, 300);
-        // 🔥 PRELOAD HISTORY DI BACKGROUND
+        // 🔥 PRELOAD HISTORY DI BACKGROUND dari cache
         if (!historyLoaded) {
-            setTimeout(() => {
-                fetch(BASE_URL + '?action=getHistory&limit=100')
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data.success && data.data) {
-                            allHistoryData = data.data;
-                            historyLoaded = true;
-                            // Jika panel history aktif, render
-                            if (document.querySelector('.panel-history.active') ||
-                                window.innerWidth >= 900) {
-                                renderHistory(allHistoryData);
-                                loadingHistory.style.display = 'none';
-                                historyContainer.style.display = 'block';
+            const cachedHistory = getHistoryCache();
+            if (cachedHistory) {
+                allHistoryData = cachedHistory;
+                historyLoaded = true;
+                if (document.querySelector('.panel-history.active') ||
+                    window.innerWidth >= 900) {
+                    renderHistory(allHistoryData);
+                    loadingHistory.style.display = 'none';
+                    historyContainer.style.display = 'block';
+                }
+            } else {
+                setTimeout(() => {
+                    fetch(BASE_URL + '?action=getHistory&limit=100')
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success && data.data) {
+                                allHistoryData = data.data;
+                                historyLoaded = true;
+                                setHistoryCache(allHistoryData);
+                                if (document.querySelector('.panel-history.active') ||
+                                    window.innerWidth >= 900) {
+                                    renderHistory(allHistoryData);
+                                    loadingHistory.style.display = 'none';
+                                    historyContainer.style.display = 'block';
+                                }
                             }
-                        }
-                    }).catch(() => {});
-            }, 400);
+                        }).catch(() => {});
+                }, 400);
+            }
         }
         return;
     }
@@ -514,22 +565,35 @@ async function loadData() {
             setTimeout(preloadPrevMonth, 300);
             // 🔥 PRELOAD HISTORY DI BACKGROUND
             if (!historyLoaded) {
-                setTimeout(() => {
-                    fetch(BASE_URL + '?action=getHistory&limit=100')
-                        .then(r => r.json())
-                        .then(data => {
-                            if (data.success && data.data) {
-                                allHistoryData = data.data;
-                                historyLoaded = true;
-                                if (document.querySelector('.panel-history.active') ||
-                                    window.innerWidth >= 900) {
-                                    renderHistory(allHistoryData);
-                                    loadingHistory.style.display = 'none';
-                                    historyContainer.style.display = 'block';
+                const cachedHistory = getHistoryCache();
+                if (cachedHistory) {
+                    allHistoryData = cachedHistory;
+                    historyLoaded = true;
+                    if (document.querySelector('.panel-history.active') ||
+                        window.innerWidth >= 900) {
+                        renderHistory(allHistoryData);
+                        loadingHistory.style.display = 'none';
+                        historyContainer.style.display = 'block';
+                    }
+                } else {
+                    setTimeout(() => {
+                        fetch(BASE_URL + '?action=getHistory&limit=100')
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.success && data.data) {
+                                    allHistoryData = data.data;
+                                    historyLoaded = true;
+                                    setHistoryCache(allHistoryData);
+                                    if (document.querySelector('.panel-history.active') ||
+                                        window.innerWidth >= 900) {
+                                        renderHistory(allHistoryData);
+                                        loadingHistory.style.display = 'none';
+                                        historyContainer.style.display = 'block';
+                                    }
                                 }
-                            }
-                        }).catch(() => {});
-                }, 400);
+                            }).catch(() => {});
+                    }, 400);
+                }
             }
         } else {
             showError(data.error || 'Gagal memuat data');
@@ -587,5 +651,6 @@ document.addEventListener('DOMContentLoaded', function() {
 window.forceRefresh = function() {
     const key = currentTahun + '-' + currentBulan;
     localStorage.removeItem(CACHE_KEY + '_' + key);
+    localStorage.removeItem(CACHE_KEY_HISTORY); // Hapus cache history juga
     loadData();
 };
