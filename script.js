@@ -14,6 +14,7 @@ let allHistoryData = [];
 let historyLoaded = false;
 let isFetching = false;
 let isFetchingHistory = false;
+let historyRendered = false; // Flag untuk cek apakah history sudah dirender
 
 // ==================== DOM REFS ====================
 const $ = (id) => document.getElementById(id);
@@ -167,10 +168,12 @@ document.querySelectorAll('.menu-panel ul li').forEach(item => {
             } else {
                 document.querySelector('.tab-selector').style.display = 'none';
                 document.querySelectorAll('.panel').forEach(p => p.classList.add('active'));
+                // Pastikan history tampil
                 if (allHistoryData.length > 0) {
                     renderHistory(allHistoryData);
                     loadingHistory.style.display = 'none';
                     historyContainer.style.display = 'block';
+                    historyRendered = true;
                 }
             }
         }
@@ -193,6 +196,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
                 renderHistory(allHistoryData);
                 loadingHistory.style.display = 'none';
                 historyContainer.style.display = 'block';
+                historyRendered = true;
             } else {
                 loadHistory();
             }
@@ -215,6 +219,7 @@ window.addEventListener('resize', function() {
             renderHistory(allHistoryData);
             loadingHistory.style.display = 'none';
             historyContainer.style.display = 'block';
+            historyRendered = true;
         }
     } else {
         tabSelector.style.display = 'flex';
@@ -230,6 +235,7 @@ window.addEventListener('resize', function() {
                     renderHistory(allHistoryData);
                     loadingHistory.style.display = 'none';
                     historyContainer.style.display = 'block';
+                    historyRendered = true;
                 } else {
                     loadHistory();
                 }
@@ -328,23 +334,26 @@ function loadHistory() {
     if (isFetchingHistory) return;
     isFetchingHistory = true;
 
-    // 1. CEK CACHE DULU
+    // 🔥 CEK CACHE DULU - LANGSUNG RENDER
     const cachedHistory = getHistoryCache();
     
     if (cachedHistory && cachedHistory.length > 0) {
         console.log('✅ HISTORY: Load dari cache, jumlah:', cachedHistory.length);
         allHistoryData = cachedHistory;
         historyLoaded = true;
+        // LANGSUNG RENDER, HILANGKAN SPINNER
         renderHistory(allHistoryData);
         loadingHistory.style.display = 'none';
         historyContainer.style.display = 'block';
+        historyRendered = true;
     } else {
-        console.log('⏳ HISTORY: Tidak ada cache, tampilkan loading');
+        console.log('⏳ HISTORY: Tidak ada cache, tampilkan spinner');
         loadingHistory.style.display = 'block';
         historyContainer.style.display = 'none';
+        historyRendered = false;
     }
 
-    // 2. FETCH DATA BARU DI BACKGROUND (SELALU JALAN)
+    // 🔥 FETCH DATA BARU DI BACKGROUND (SELALU JALAN)
     fetch(BASE_URL + '?action=getHistory&limit=100')
         .then(r => {
             if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -355,16 +364,19 @@ function loadHistory() {
                 console.log('🔄 HISTORY: Update dari server, jumlah:', data.data.length);
                 allHistoryData = data.data;
                 historyLoaded = true;
-                setHistoryCache(allHistoryData); // Simpan ke cache
+                setHistoryCache(allHistoryData);
+                // RENDER ULANG DENGAN DATA BARU
                 renderHistory(allHistoryData);
                 loadingHistory.style.display = 'none';
                 historyContainer.style.display = 'block';
+                historyRendered = true;
             } else if (!cachedHistory || cachedHistory.length === 0) {
                 // Tidak ada cache dan server return empty
                 loadingHistory.style.display = 'none';
                 historyBody.innerHTML =
                     '<tr><td colspan="5" style="text-align:center;padding:20px;color:#5a6488;">📭 Belum ada transaksi</td></tr>';
                 historyContainer.style.display = 'block';
+                historyRendered = true;
             }
         })
         .catch((err) => {
@@ -374,6 +386,7 @@ function loadHistory() {
                 historyBody.innerHTML =
                     '<tr><td colspan="5" style="text-align:center;padding:20px;color:#f44336;">❌ Gagal memuat history</td></tr>';
                 historyContainer.style.display = 'block';
+                historyRendered = true;
             }
         })
         .finally(() => {
@@ -491,7 +504,7 @@ nextBtn.addEventListener('click', function() {
 async function loadData() {
     const key = currentTahun + '-' + currentBulan;
     
-    // 1. CEK CACHE
+    // 1. CEK CACHE DATA KAS
     const cached = getCache(key);
     
     if (cached) {
@@ -506,7 +519,11 @@ async function loadData() {
         showSkeleton(30);
     }
 
-    // 2. FETCH DATA BARU DI BACKGROUND
+    // 2. LOAD HISTORY - LANGSUNG DARI CACHE
+    // 🔥 INI YANG DIPERBAIKI - LANGSUNG PANGGIL DAN RENDER DARI CACHE
+    loadHistory();
+
+    // 3. FETCH DATA KAS BARU DI BACKGROUND
     if (!isFetching) {
         isFetching = true;
         try {
@@ -536,9 +553,6 @@ async function loadData() {
         }
         isFetching = false;
     }
-
-    // 3. LOAD HISTORY (CACHE FIRST, UPDATE BACKGROUND)
-    loadHistory();
 }
 
 // ==================== PRELOAD BULAN SEBELUMNYA ====================
@@ -553,7 +567,6 @@ function preloadPrevMonth() {
     if (idx > 0) {
         const prev = availableMonths[idx - 1];
         const key = prev.tahun + '-' + prev.bulan;
-        // Cek apakah sudah ada cache
         if (!getCache(key)) {
             console.log('⏳ PRELOAD: Fetch ' + prev.label);
             const url = BASE_URL + '?action=getMonthlyTable&tahun=' + prev.tahun + '&bulan=' + prev.bulan;
@@ -628,6 +641,7 @@ window.forceRefresh = function() {
     console.log('🗑️ Cache cleared, reloading...');
     allHistoryData = [];
     historyLoaded = false;
+    historyRendered = false;
     loadData();
 };
 
@@ -637,7 +651,6 @@ window.showCache = function() {
     console.log('  - Kas:', localStorage.getItem(CACHE_KEY + '_' + currentTahun + '-' + currentBulan) ? '✅ Ada' : '❌ Tidak ada');
     console.log('  - History:', localStorage.getItem(CACHE_KEY_HISTORY) ? '✅ Ada' : '❌ Tidak ada');
     
-    // Tampilkan detail
     const history = getHistoryCache();
     if (history) {
         console.log('  - History jumlah:', history.length);
