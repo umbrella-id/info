@@ -256,6 +256,37 @@
             color: #8892b0;
         }
 
+        /* ===== SKELETON ===== */
+        .skeleton-row td {
+            height: 32px;
+            background: #1a1f2e;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+        .skeleton-row td:first-child {
+            width: 30px;
+        }
+        .skeleton-row td:nth-child(2) {
+            width: 80px;
+        }
+        .skeleton-row td.centang-cell {
+            width: 34px;
+        }
+        .skeleton-row td.deposit {
+            width: 60px;
+        }
+        .skeleton-row td.estimasi {
+            width: 70px;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
         /* ===== HISTORY ===== */
         .history-wrap {
             overflow-x: auto;
@@ -513,15 +544,32 @@
         </div>
 
         <div class="table-wrap">
-            <div id="loadingTable" class="loading-state">
-                <div class="spinner"></div>
-                <div>⏳ Memuat data...</div>
+            <!-- SKELETON -->
+            <div id="skeletonContainer">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th><th>IGN</th>
+                            <th class="centang-header">6</th>
+                            <th class="centang-header">13</th>
+                            <th class="centang-header">20</th>
+                            <th class="centang-header">27</th>
+                            <th>Deposit</th><th>Estimasi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="skeletonBody"></tbody>
+                </table>
             </div>
+            <!-- TABLE -->
             <div id="tableContainer" style="display:none;">
                 <table>
                     <thead id="tableHead"></thead>
                     <tbody id="tableBody"></tbody>
                 </table>
+            </div>
+            <div id="loadingTable" class="loading-state" style="display:none;">
+                <div class="spinner"></div>
+                <div>⏳ Memuat data...</div>
             </div>
         </div>
     </div>
@@ -555,8 +603,11 @@
 
     <script>
         // ==================== KONFIGURASI ====================
-        // GANTI DENGAN URL GAS ANDA
         const BASE_URL = 'https://script.google.com/macros/s/AKfycbzTP1-9KuQ2iz4ffTfhujqkSIQqQxXWMXY-BHljCVU_Zzm0Ept8j4AJUCBHqB-ZSZk/exec';
+        const CACHE_KEY = 'kas_data';
+        const CACHE_EXPIRY = 5 * 60 * 1000; // 5 menit
+        const START_YEAR = 2025;
+        const START_MONTH = 6; // Juni
 
         // ==================== STATE ====================
         let currentTahun = new Date().getFullYear();
@@ -564,6 +615,7 @@
         let availableMonths = [];
         let allHistoryData = [];
         let currentData = null;
+        let historyLoaded = false;
 
         // ==================== DOM REFS ====================
         const $ = (id) => document.getElementById(id);
@@ -574,11 +626,83 @@
         const tableHead = $('tableHead');
         const tableBody = $('tableBody');
         const tableContainer = $('tableContainer');
-        const loadingTable = $('loadingTable');
+        const skeletonContainer = $('skeletonContainer');
+        const skeletonBody = $('skeletonBody');
         const historySearch = $('historySearch');
         const historyBody = $('historyBody');
         const historyContainer = $('historyContainer');
         const loadingHistory = $('loadingHistory');
+
+        // ==================== CACHE ====================
+        function getCache(key) {
+            try {
+                const raw = localStorage.getItem(CACHE_KEY + '_' + key);
+                if (!raw) return null;
+                const data = JSON.parse(raw);
+                if (Date.now() - data.timestamp > CACHE_EXPIRY) {
+                    localStorage.removeItem(CACHE_KEY + '_' + key);
+                    return null;
+                }
+                return data.value;
+            } catch (e) { return null; }
+        }
+
+        function setCache(key, value) {
+            try {
+                localStorage.setItem(CACHE_KEY + '_' + key, JSON.stringify({
+                    timestamp: Date.now(),
+                    value: value
+                }));
+            } catch (e) { /* ignore */ }
+        }
+
+        // ==================== GENERATE MONTHS ====================
+        function generateMonthList() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+            const months = [];
+            let year = START_YEAR;
+            let month = START_MONTH;
+
+            while (year < currentYear || (year === currentYear && month <= currentMonth)) {
+                months.push({
+                    tahun: year,
+                    bulan: month,
+                    label: getNamaBulan(month) + ' ' + year
+                });
+                month++;
+                if (month > 12) {
+                    month = 1;
+                    year++;
+                }
+            }
+            return months;
+        }
+
+        // ==================== SKELETON ====================
+        function showSkeleton(count) {
+            count = count || 30;
+            let html = '';
+            for (let i = 0; i < count; i++) {
+                html += '<tr class="skeleton-row">';
+                html += '<td></td><td></td>';
+                html += '<td class="centang-cell"></td>';
+                html += '<td class="centang-cell"></td>';
+                html += '<td class="centang-cell"></td>';
+                html += '<td class="centang-cell"></td>';
+                html += '<td class="deposit"></td>';
+                html += '<td class="estimasi"></td>';
+                html += '</tr>';
+            }
+            skeletonBody.innerHTML = html;
+            skeletonContainer.style.display = 'block';
+            tableContainer.style.display = 'none';
+        }
+
+        function hideSkeleton() {
+            skeletonContainer.style.display = 'none';
+        }
 
         // ==================== FORMAT SPINA ====================
         function formatSpina(angka) {
@@ -611,63 +735,16 @@
                     $('tabLaporan').classList.add('active');
                 } else if (target === 'history') {
                     $('tabHistory').classList.add('active');
-                    if (allHistoryData.length === 0) {
-                        loadHistory();
-                    } else {
+                    if (allHistoryData.length > 0) {
                         renderHistory(allHistoryData);
+                        loadingHistory.style.display = 'none';
+                        historyContainer.style.display = 'block';
+                    } else {
+                        loadHistory();
                     }
                 }
             });
         });
-
-        // ==================== LOAD AVAILABLE MONTHS ====================
-        async function loadAvailableMonths() {
-            try {
-                const res = await fetch(BASE_URL + '?action=getAvailableMonths');
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const data = await res.json();
-                if (data.success && data.months && data.months.length > 0) {
-                    availableMonths = data.months;
-                    const last = availableMonths[availableMonths.length - 1];
-                    currentTahun = last.tahun;
-                    currentBulan = last.bulan;
-                    updateNavButtons();
-                    loadData();
-                } else {
-                    showError('Tidak ada bulan tersedia');
-                }
-            } catch (e) {
-                console.error('Error load available months:', e);
-                // Fallback: tetap coba load data dengan bulan saat ini
-                loadData();
-            }
-        }
-
-        // ==================== LOAD DATA ====================
-        async function loadData() {
-            showLoading(true);
-            try {
-                const url = BASE_URL + '?action=getMonthlyTable&tahun=' + currentTahun + '&bulan=' + currentBulan;
-                console.log('Fetching:', url);
-                const res = await fetch(url);
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const data = await res.json();
-                console.log('Data received:', data);
-                if (data.success) {
-                    currentData = data;
-                    renderTable(data);
-                    updateHeader(data);
-                    monthLabel.textContent = data.bulanNama || (currentBulan + '/' + currentTahun);
-                    updateNavButtons();
-                } else {
-                    showError(data.error || 'Gagal memuat data');
-                }
-            } catch (e) {
-                console.error('Error load data:', e);
-                showError('Error: ' + e.message);
-            }
-            showLoading(false);
-        }
 
         // ==================== RENDER TABLE ====================
         function renderTable(data) {
@@ -731,7 +808,7 @@
 
             tableBody.innerHTML = bodyHtml;
             tableContainer.style.display = 'block';
-            loadingTable.style.display = 'none';
+            hideSkeleton();
 
             applySearch();
         }
@@ -766,6 +843,7 @@
                 loadingHistory.style.display = 'none';
                 if (data.success && data.data) {
                     allHistoryData = data.data;
+                    historyLoaded = true;
                     renderHistory(allHistoryData);
                 } else {
                     historyBody.innerHTML =
@@ -801,6 +879,20 @@
                 '<tr><td colspan="5" style="text-align:center;padding:20px;color:#5a6488;">📭 Tidak ada data</td></tr>';
             historyContainer.style.display = 'block';
             loadingHistory.style.display = 'none';
+        }
+
+        // ==================== PRELOAD HISTORY (BACKGROUND) ====================
+        function preloadHistory() {
+            if (historyLoaded) return;
+            fetch(BASE_URL + '?action=getHistory&limit=100')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        allHistoryData = data.data;
+                        historyLoaded = true;
+                    }
+                })
+                .catch(() => {});
         }
 
         // ==================== SEARCH ====================
@@ -874,15 +966,55 @@
             }
         });
 
+        // ==================== LOAD DATA (1 REQUEST) ====================
+        async function loadData() {
+            const key = currentTahun + '-' + currentBulan;
+
+            // Skeleton sudah tampil dari awal
+
+            // Cek cache
+            const cached = getCache(key);
+            if (cached) {
+                console.log('✅ Load dari cache');
+                currentData = cached;
+                renderTable(cached);
+                updateHeader(cached);
+                monthLabel.textContent = cached.bulanNama || (currentBulan + '/' + currentTahun);
+                updateNavButtons();
+                // Preload history di background
+                setTimeout(preloadHistory, 300);
+                return;
+            }
+
+            try {
+                // HANYA 1 REQUEST!
+                const url = BASE_URL + '?action=getMonthlyTable&tahun=' + currentTahun + '&bulan=' + currentBulan;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+
+                if (data.success) {
+                    currentData = data;
+                    setCache(key, data);
+                    renderTable(data);
+                    updateHeader(data);
+                    monthLabel.textContent = data.bulanNama || (currentBulan + '/' + currentTahun);
+                    updateNavButtons();
+                    // Preload history di background
+                    setTimeout(preloadHistory, 300);
+                } else {
+                    showError(data.error || 'Gagal memuat data');
+                }
+            } catch (e) {
+                console.error('Error load data:', e);
+                showError('Error: ' + e.message);
+            }
+        }
+
         // ==================== UTILITY ====================
         function formatTanggalEstimasi(date) {
             const bulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
             return date.getDate() + ' ' + bulan[date.getMonth()] + ' ' + date.getFullYear();
-        }
-
-        function showLoading(show) {
-            loadingTable.style.display = show ? 'block' : 'none';
-            tableContainer.style.display = show ? 'none' : 'block';
         }
 
         function showError(msg) {
@@ -890,37 +1022,41 @@
             tableHead.innerHTML = '';
             tableBody.innerHTML =
                 '<tr><td colspan="10" style="text-align:center;padding:30px;color:#f44336;">❌ ' + msg + '</td></tr>';
-            loadingTable.style.display = 'none';
+            hideSkeleton();
         }
 
-        // ==================== INIT ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            // Coba langsung load data bulan ini tanpa getAvailableMonths dulu
-            const now = new Date();
-            currentTahun = now.getFullYear();
-            currentBulan = now.getMonth() + 1;
-            monthLabel.textContent = getNamaBulan(currentBulan) + ' ' + currentTahun;
-            loadData();
-
-            // Load available months for navigation (background)
-            fetch(BASE_URL + '?action=getAvailableMonths')
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success && data.months) {
-                        availableMonths = data.months;
-                        updateNavButtons();
-                    }
-                })
-                .catch(() => {});
-        });
-
-        // Helper untuk nama bulan
         function getNamaBulan(bulan) {
             const nama = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober',
                 'November', 'Desember'
             ];
             return nama[bulan - 1] || bulan;
         }
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Generate daftar bulan (tanpa fetch!)
+            availableMonths = generateMonthList();
+
+            // 2. Set ke bulan terakhir (current)
+            const last = availableMonths[availableMonths.length - 1];
+            currentTahun = last.tahun;
+            currentBulan = last.bulan;
+            monthLabel.textContent = last.label;
+            updateNavButtons();
+
+            // 3. Tampilkan skeleton
+            showSkeleton(30);
+
+            // 4. Load data (1 request)
+            loadData();
+        });
+
+        // ==================== GLOBAL REFRESH ====================
+        window.forceRefresh = function() {
+            const key = currentTahun + '-' + currentBulan;
+            localStorage.removeItem(CACHE_KEY + '_' + key);
+            loadData();
+        };
     </script>
 </body>
 </html>
