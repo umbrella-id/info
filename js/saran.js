@@ -8,15 +8,18 @@ if (!myUID) {
     myUID = 'SARAN-' + Math.random().toString(36).substring(2, 10).toUpperCase();
     localStorage.setItem('u_uid_saran', myUID);
 }
+let saranPopupHistory = [];
 
 // ==================== RENDER SARAN ====================
 function renderSaran() {
+    // Cek apakah popup sudah ada
     if (document.getElementById('saranPopupOverlay')) {
         const popup = document.getElementById('saranPopupOverlay');
         popup.style.display = 'flex';
         return;
     }
 
+    // Buat popup overlay di atas konten yang ada
     const popupHTML = `
         <div class="saran-popup-overlay" id="saranPopupOverlay">
             <div class="saran-popup-container">
@@ -42,12 +45,15 @@ function renderSaran() {
 
     document.body.insertAdjacentHTML('beforeend', popupHTML);
 
-    // 🔥 SET STATE POPUP TERBUKA
+    // SET STATE POPUP TERBUKA
     if (window.setSaranPopupOpen) {
         window.setSaranPopupOpen(true);
     }
+    
+    saranPopupHistory.push('saran');
     history.pushState({ saran: true }, null, '#saran');
 
+    // 🔥 SEMBUNYIKAN HEADER KAS
     const headerKas = document.querySelector('.header-kas');
     if (headerKas) headerKas.style.display = 'none';
 
@@ -56,6 +62,7 @@ function renderSaran() {
 
 // ==================== CLOSE SARAN ====================
 function closeSaran() {
+    // Hapus popup dari body
     const popup = document.getElementById('saranPopupOverlay');
     if (popup) {
         popup.remove();
@@ -72,13 +79,10 @@ function closeSaran() {
         }
     }
 
-    const headerKas = document.querySelector('.header-kas');
-    if (headerKas) headerKas.style.display = 'flex';
-
-    // AMBIL TAB SEBELUMNYA
+    // 🔥 KEMBALI KE TAB SEBELUMNYA
     const lastTab = window.getLastActiveTab ? window.getLastActiveTab() : 'laporan';
     
-    // UPDATE MENU AKTIF DI FLOATING PANEL
+    // 🔥 UPDATE MENU AKTIF DI FLOATING PANEL
     document.querySelectorAll('.menu-panel ul li').forEach(function(i) {
         i.classList.remove('active');
     });
@@ -90,7 +94,7 @@ function closeSaran() {
         if (fallbackMenu) fallbackMenu.classList.add('active');
     }
 
-    // RENDER TAB YANG SESUAI
+    // 🔥 RENDER TAB YANG SESUAI
     if (lastTab === 'laporan') {
         if (typeof renderLaporan === 'function') {
             renderLaporan();
