@@ -8,18 +8,15 @@ if (!myUID) {
     myUID = 'SARAN-' + Math.random().toString(36).substring(2, 10).toUpperCase();
     localStorage.setItem('u_uid_saran', myUID);
 }
-let saranPopupHistory = []; // Untuk back button
 
 // ==================== RENDER SARAN ====================
 function renderSaran() {
-    // Cek apakah popup sudah ada
     if (document.getElementById('saranPopupOverlay')) {
         const popup = document.getElementById('saranPopupOverlay');
         popup.style.display = 'flex';
         return;
     }
 
-    // Buat popup overlay di atas konten yang ada
     const popupHTML = `
         <div class="saran-popup-overlay" id="saranPopupOverlay">
             <div class="saran-popup-container">
@@ -45,11 +42,12 @@ function renderSaran() {
 
     document.body.insertAdjacentHTML('beforeend', popupHTML);
 
-    // 🔥 TAMBAHKAN KE HISTORY UNTUK BACK BUTTON
-    saranPopupHistory.push('saran');
+    // 🔥 SET STATE POPUP TERBUKA
+    if (window.setSaranPopupOpen) {
+        window.setSaranPopupOpen(true);
+    }
     history.pushState({ saran: true }, null, '#saran');
 
-    // Sembunyikan header kas
     const headerKas = document.querySelector('.header-kas');
     if (headerKas) headerKas.style.display = 'none';
 
@@ -58,13 +56,15 @@ function renderSaran() {
 
 // ==================== CLOSE SARAN ====================
 function closeSaran() {
-    // Hapus popup dari body
     const popup = document.getElementById('saranPopupOverlay');
     if (popup) {
         popup.remove();
     }
 
-    // 🔥 HAPUS DARI HISTORY STATE
+    // 🔥 SET STATE POPUP TERTUTUP
+    if (window.setSaranPopupOpen) {
+        window.setSaranPopupOpen(false);
+    }
     if (saranPopupHistory.length > 0) {
         saranPopupHistory.pop();
         if (saranPopupHistory.length === 0) {
@@ -72,11 +72,9 @@ function closeSaran() {
         }
     }
 
-    // Tampilkan kembali header kas
     const headerKas = document.querySelector('.header-kas');
     if (headerKas) headerKas.style.display = 'flex';
 
-    // Kembali ke tab sebelumnya
     const lastTab = window.getLastActiveTab ? window.getLastActiveTab() : 'laporan';
     
     document.querySelectorAll('.menu-panel ul li').forEach(function(i) {
@@ -177,15 +175,6 @@ function initSaranEvents() {
             }
         });
     }
-
-    // 🔥 BACK BUTTON ANDROID SUPPORT
-    window.addEventListener('popstate', function(e) {
-        const popup = document.getElementById('saranPopupOverlay');
-        if (popup && popup.style.display !== 'none') {
-            closeSaran();
-            e.preventDefault();
-        }
-    });
 
     console.log("✅ Kotak Saran terintegrasi");
 }
