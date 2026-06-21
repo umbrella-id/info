@@ -14,7 +14,7 @@ let allHistoryData = [];
 let historyLoaded = false;
 let isFetching = false;
 let isFetchingHistory = false;
-let historyRendered = false; // Flag untuk cek apakah history sudah dirender
+let historyRendered = false;
 
 // ==================== DOM REFS ====================
 const $ = (id) => document.getElementById(id);
@@ -168,7 +168,6 @@ document.querySelectorAll('.menu-panel ul li').forEach(item => {
             } else {
                 document.querySelector('.tab-selector').style.display = 'none';
                 document.querySelectorAll('.panel').forEach(p => p.classList.add('active'));
-                // Pastikan history tampil
                 if (allHistoryData.length > 0) {
                     renderHistory(allHistoryData);
                     loadingHistory.style.display = 'none';
@@ -334,14 +333,12 @@ function loadHistory() {
     if (isFetchingHistory) return;
     isFetchingHistory = true;
 
-    // 🔥 CEK CACHE DULU - LANGSUNG RENDER
     const cachedHistory = getHistoryCache();
     
     if (cachedHistory && cachedHistory.length > 0) {
         console.log('✅ HISTORY: Load dari cache, jumlah:', cachedHistory.length);
         allHistoryData = cachedHistory;
         historyLoaded = true;
-        // LANGSUNG RENDER, HILANGKAN SPINNER
         renderHistory(allHistoryData);
         loadingHistory.style.display = 'none';
         historyContainer.style.display = 'block';
@@ -353,7 +350,6 @@ function loadHistory() {
         historyRendered = false;
     }
 
-    // 🔥 FETCH DATA BARU DI BACKGROUND (SELALU JALAN)
     fetch(BASE_URL + '?action=getHistory&limit=100')
         .then(r => {
             if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -365,13 +361,11 @@ function loadHistory() {
                 allHistoryData = data.data;
                 historyLoaded = true;
                 setHistoryCache(allHistoryData);
-                // RENDER ULANG DENGAN DATA BARU
                 renderHistory(allHistoryData);
                 loadingHistory.style.display = 'none';
                 historyContainer.style.display = 'block';
                 historyRendered = true;
             } else if (!cachedHistory || cachedHistory.length === 0) {
-                // Tidak ada cache dan server return empty
                 loadingHistory.style.display = 'none';
                 historyBody.innerHTML =
                     '<tr><td colspan="5" style="text-align:center;padding:20px;color:#5a6488;">📭 Belum ada transaksi</td></tr>';
@@ -420,13 +414,123 @@ function renderHistory(data) {
         html += '<td class="col-date">' + dateStr + '</td>';
         html += '<td class="col-ign">' + (item.ign || '-') + '</td>';
         html += '<td class="col-amount ' + spinaClass + '">' + spinaFormatted + '</td>';
-        html += '<td class="col-notes">' + (item.notes || '-') + '</td>';
+        html += '<td class="col-notes" data-notes="' + (item.notes || '').replace(/"/g, '&quot;') + '">' + (item.notes || '-') + '</td>';
         html += '<td class="col-admin">' + (item.adm || '-') + '</td>';
         html += '</tr>';
     }
     historyBody.innerHTML = html;
     historyContainer.style.display = 'block';
     loadingHistory.style.display = 'none';
+}
+
+// ==================== POPUP DETAIL ====================
+function initPopup() {
+    // Buat elemen popup jika belum ada
+    if (!document.getElementById('popupOverlay')) {
+        const popupHTML = `
+            <div class="popup-overlay" id="popupOverlay">
+                <div class="popup-content">
+                    <button class="popup-close" id="popupClose"><i class="fas fa-times"></i></button>
+                    <div class="popup-title">📝 Detail Transaksi</div>
+                    <div class="popup-ign" id="popupIgn">-</div>
+                    <hr class="popup-divider" />
+                    <div class="popup-row">
+                        <span class="label">📅 Tanggal</span>
+                        <span class="value" id="popupDate">-</span>
+                    </div>
+                    <div class="popup-row">
+                        <span class="label">💰 Jumlah</span>
+                        <span class="value" id="popupAmount">-</span>
+                    </div>
+                    <div class="popup-row">
+                        <span class="label">👤 Admin</span>
+                        <span class="value" id="popupAdmin">-</span>
+                    </div>
+                    <hr class="popup-divider" />
+                    <div class="popup-title" style="font-size:11px; margin-bottom:6px;">📋 Catatan Lengkap</div>
+                    <div class="popup-notes" id="popupNotes">-</div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', popupHTML);
+    }
+
+    const popupOverlay = document.getElementById('popupOverlay');
+    const popupClose = document.getElementById('popupClose');
+    const popupIgn = document.getElementById('popupIgn');
+    const popupDate = document.getElementById('popupDate');
+    const popupAmount = document.getElementById('popupAmount');
+    const popupAdmin = document.getElementById('popupAdmin');
+    const popupNotes = document.getElementById('popupNotes');
+
+    function closePopup() {
+        popupOverlay.classList.remove('active');
+    }
+
+    popupClose.addEventListener('click', closePopup);
+    popupOverlay.addEventListener('click', function(e) {
+        if (e.target === this) closePopup();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closePopup();
+    });
+
+    window.openPopup = function(item) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const date = new Date(item.date);
+        const dateStr = String(date.getDate()).padStart(2, '0') + '-' + 
+                        months[date.getMonth()] + '-' + 
+                        String(date.getFullYear()).slice(-2);
+        
+        const spina = item.spina || 0;
+        const spinaClass = spina >= 0 ? 'positive' : 'negative';
+        const spinaFormatted = (spina >= 0 ? '+' : '') + formatSpinaRaw(spina) + ' S';
+        
+        popupIgn.textContent = item.ign || '-';
+        popupDate.textContent = dateStr;
+        popupAmount.textContent = spinaFormatted;
+        popupAmount.className = 'value ' + spinaClass;
+        popupAdmin.textContent = item.adm || '-';
+        popupNotes.textContent = item.notes || 'Tidak ada catatan';
+        
+        popupOverlay.classList.add('active');
+    };
+
+    // Event listener untuk klik pada kolom notes
+    document.addEventListener('click', function(e) {
+        const notesCell = e.target.closest('.col-notes');
+        if (notesCell) {
+            const row = notesCell.closest('tr');
+            if (row) {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 5) {
+                    // Ambil data dari data attribute atau text
+                    const notes = notesCell.getAttribute('data-notes') || notesCell.textContent.trim();
+                    const item = {
+                        date: cells[0].textContent.trim(),
+                        ign: cells[1].textContent.trim(),
+                        spina: parseFloat(cells[2].textContent.replace(/[^0-9\-]/g, '')) || 0,
+                        notes: notes,
+                        adm: cells[4].textContent.trim()
+                    };
+                    
+                    // Konversi date string ke format yang bisa diparse
+                    const parts = item.date.split('-');
+                    if (parts.length === 3) {
+                        const monthMap = {'Jan':0,'Feb':1,'Mar':2,'Apr':3,'Mei':4,'Jun':5,'Jul':6,'Agu':7,'Sep':8,'Okt':9,'Nov':10,'Des':11};
+                        const year = 2000 + parseInt(parts[2]);
+                        const month = monthMap[parts[1]] || 0;
+                        const day = parseInt(parts[0]);
+                        item.date = new Date(year, month, day).toISOString();
+                    }
+                    
+                    if (window.openPopup) {
+                        window.openPopup(item);
+                    }
+                }
+            }
+        }
+    });
 }
 
 // ==================== SEARCH ====================
@@ -504,7 +608,6 @@ nextBtn.addEventListener('click', function() {
 async function loadData() {
     const key = currentTahun + '-' + currentBulan;
     
-    // 1. CEK CACHE DATA KAS
     const cached = getCache(key);
     
     if (cached) {
@@ -519,11 +622,8 @@ async function loadData() {
         showSkeleton(30);
     }
 
-    // 2. LOAD HISTORY - LANGSUNG DARI CACHE
-    // 🔥 INI YANG DIPERBAIKI - LANGSUNG PANGGIL DAN RENDER DARI CACHE
     loadHistory();
 
-    // 3. FETCH DATA KAS BARU DI BACKGROUND
     if (!isFetching) {
         isFetching = true;
         try {
@@ -626,10 +726,10 @@ document.addEventListener('DOMContentLoaded', function() {
         $('panelKas').classList.add('active');
     }
 
-    // Load data dengan logika cache first
-    loadData();
+    // Inisialisasi popup
+    initPopup();
 
-    // Preload bulan sebelumnya (delay biar tidak compete)
+    loadData();
     setTimeout(preloadPrevMonth, 500);
 });
 
