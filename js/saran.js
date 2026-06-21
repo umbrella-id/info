@@ -8,18 +8,18 @@ if (!myUID) {
     myUID = 'SARAN-' + Math.random().toString(36).substring(2, 10).toUpperCase();
     localStorage.setItem('u_uid_saran', myUID);
 }
+let saranPopupHistory = []; // Untuk back button
 
 // ==================== RENDER SARAN ====================
 function renderSaran() {
-    // 🔥 CEK APAKAH POPUP SUDAH ADA
+    // Cek apakah popup sudah ada
     if (document.getElementById('saranPopupOverlay')) {
-        // Jika sudah ada, tampilkan saja
         const popup = document.getElementById('saranPopupOverlay');
         popup.style.display = 'flex';
         return;
     }
 
-    // 🔥 BUAT POPUP OVERLAY DI ATAS KONTEN YANG ADA
+    // Buat popup overlay di atas konten yang ada
     const popupHTML = `
         <div class="saran-popup-overlay" id="saranPopupOverlay">
             <div class="saran-popup-container">
@@ -43,10 +43,13 @@ function renderSaran() {
         </div>
     `;
 
-    // 🔥 TAMBAHKAN POPUP KE BODY, BUKAN MAIN CONTENT
     document.body.insertAdjacentHTML('beforeend', popupHTML);
 
-    // 🔥 SEMBUNYIKAN HEADER KAS SAAT POPUP TERBUKA
+    // 🔥 TAMBAHKAN KE HISTORY UNTUK BACK BUTTON
+    saranPopupHistory.push('saran');
+    history.pushState({ saran: true }, null, '#saran');
+
+    // Sembunyikan header kas
     const headerKas = document.querySelector('.header-kas');
     if (headerKas) headerKas.style.display = 'none';
 
@@ -55,17 +58,25 @@ function renderSaran() {
 
 // ==================== CLOSE SARAN ====================
 function closeSaran() {
-    // 🔥 HAPUS POPUP DARI BODY
+    // Hapus popup dari body
     const popup = document.getElementById('saranPopupOverlay');
     if (popup) {
         popup.remove();
     }
 
-    // 🔥 TAMPILKAN KEMBALI HEADER KAS
+    // 🔥 HAPUS DARI HISTORY STATE
+    if (saranPopupHistory.length > 0) {
+        saranPopupHistory.pop();
+        if (saranPopupHistory.length === 0) {
+            history.replaceState(null, null, ' ');
+        }
+    }
+
+    // Tampilkan kembali header kas
     const headerKas = document.querySelector('.header-kas');
     if (headerKas) headerKas.style.display = 'flex';
 
-    // 🔥 KEMBALI KE TAB SEBELUMNYA
+    // Kembali ke tab sebelumnya
     const lastTab = window.getLastActiveTab ? window.getLastActiveTab() : 'laporan';
     
     document.querySelectorAll('.menu-panel ul li').forEach(function(i) {
@@ -166,6 +177,15 @@ function initSaranEvents() {
             }
         });
     }
+
+    // 🔥 BACK BUTTON ANDROID SUPPORT
+    window.addEventListener('popstate', function(e) {
+        const popup = document.getElementById('saranPopupOverlay');
+        if (popup && popup.style.display !== 'none') {
+            closeSaran();
+            e.preventDefault();
+        }
+    });
 
     console.log("✅ Kotak Saran terintegrasi");
 }
