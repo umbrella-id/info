@@ -75,14 +75,23 @@ function closeSaran() {
     const headerKas = document.querySelector('.header-kas');
     if (headerKas) headerKas.style.display = 'flex';
 
+    // 🔥 AMBIL TAB SEBELUMNYA
     const lastTab = window.getLastActiveTab ? window.getLastActiveTab() : 'laporan';
     
+    // 🔥 UPDATE MENU AKTIF DI PANEL - PINDAH KE TAB SEBELUMNYA
     document.querySelectorAll('.menu-panel ul li').forEach(function(i) {
         i.classList.remove('active');
     });
     const menuItem = document.querySelector('.menu-panel ul li[data-page="' + lastTab + '"]');
-    if (menuItem) menuItem.classList.add('active');
+    if (menuItem) {
+        menuItem.classList.add('active');
+    } else {
+        // Fallback ke laporan
+        const fallbackMenu = document.querySelector('.menu-panel ul li[data-page="laporan"]');
+        if (fallbackMenu) fallbackMenu.classList.add('active');
+    }
 
+    // 🔥 RENDER TAB YANG SESUAI
     if (lastTab === 'laporan') {
         if (typeof renderLaporan === 'function') {
             renderLaporan();
