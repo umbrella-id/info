@@ -382,13 +382,13 @@ td.col-no {
 
 /* Centang - Hijau untuk paid */
 #tableBody td .paid {
-    color: hsl(142, 69%, 58%) !important;
+    color: var(--color-primary);
     font-size: 12px !important;
 }
 
 /* Centang - Merah untuk unpaid */
 #tableBody td .unpaid {
-    color: #f87171 !important;
+    color: var(--text-muted);
     font-size: 12px !important;
 }
 
