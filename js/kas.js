@@ -15,6 +15,7 @@ let historyLoaded = false;
 let isFetching = false;
 let isFetchingHistory = false;
 let historyRendered = false;
+let isNavigating = false; // Flag untuk mencegah navigasi ganda
 
 // ==================== CACHE FUNCTIONS ====================
 function getCache(key) {
@@ -92,14 +93,27 @@ function formatSpinaRaw(angka) {
     return Math.round(angka).toLocaleString('id-ID');
 }
 
+// ==================== UPDATE MONTH LABEL ====================
+function updateMonthLabel(data) {
+    if (!monthLabel) return;
+    
+    // Prioritaskan dari data yang diterima
+    if (data && data.bulanNama) {
+        monthLabel.textContent = data.bulanNama;
+        return;
+    }
+    
+    // Fallback: gunakan currentTahun/currentBulan
+    if (currentTahun && currentBulan) {
+        monthLabel.textContent = getNamaBulan(currentBulan) + ' ' + currentTahun;
+    }
+}
+
 // ==================== RENDER HTML LAPORAN ====================
 function renderLaporan() {
     const mainContent = document.getElementById('mainContent');
     if (!mainContent) return;
 
-    // Ambil data dari cache atau fetch
-    const key = currentTahun + '-' + currentBulan;
-    const cached = getCache(key);
     const isWide = window.innerWidth >= 900;
 
     // Build HTML
@@ -200,13 +214,12 @@ function renderLaporan() {
     // Inisialisasi DOM refs
     initKasDOM();
 
-    // 🔥 SET INITIAL ACTIVE PANEL - SESUAI MODE
+    // Set initial active panel sesuai mode
     const panelKas = document.getElementById('panelKas');
     const panelHistory = document.getElementById('panelHistory');
     const tabSelector = document.getElementById('tabSelector');
 
     if (isWide) {
-        // Mode PC - kedua panel aktif
         if (panelKas) {
             panelKas.style.display = 'flex';
             panelKas.classList.add('active');
@@ -217,7 +230,6 @@ function renderLaporan() {
         }
         if (tabSelector) tabSelector.style.display = 'none';
     } else {
-        // Mode HP - hanya panel kas yang aktif
         if (panelKas) {
             panelKas.style.display = 'flex';
             panelKas.classList.add('active');
@@ -227,7 +239,6 @@ function renderLaporan() {
             panelHistory.classList.remove('active');
         }
         if (tabSelector) tabSelector.style.display = 'flex';
-        // Set tab aktif ke kas
         document.querySelectorAll('.tab-btn').forEach(function(b) {
             b.classList.remove('active');
         });
@@ -393,12 +404,15 @@ function loadData() {
         console.log('✅ DATA KAS: Load dari cache untuk ' + key);
         renderTable(cached);
         updateHeader(cached);
-        if (monthLabel) monthLabel.textContent = cached.bulanNama || (currentBulan + '/' + currentTahun);
+        // 🔥 UPDATE MONTH LABEL DARI CACHE
+        updateMonthLabel(cached);
         updateNavButtons();
         hideSkeleton();
     } else {
         console.log('⏳ DATA KAS: Tidak ada cache, tampilkan skeleton');
         showSkeleton(30);
+        // Tampilkan label sementara dari state
+        updateMonthLabel(null);
     }
 
     loadHistory();
@@ -414,18 +428,21 @@ function loadData() {
                     console.log('🔄 DATA KAS: Update dari server untuk ' + key);
                     renderTable(data);
                     updateHeader(data);
-                    if (monthLabel) monthLabel.textContent = data.bulanNama || (currentBulan + '/' + currentTahun);
+                    // 🔥 UPDATE MONTH LABEL DARI DATA SERVER
+                    updateMonthLabel(data);
                     updateNavButtons();
                     hideSkeleton();
                 } else {
                     if (!cached) showError(data.error || 'Gagal memuat data');
                 }
                 isFetching = false;
+                isNavigating = false;
             })
             .catch(e => {
                 console.error('❌ DATA KAS: Error fetch:', e);
                 if (!cached) showError('Error: ' + e.message);
                 isFetching = false;
+                isNavigating = false;
             });
     }
 }
@@ -756,7 +773,6 @@ function initKasEvents() {
                 p.style.display = 'flex';
                 p.classList.add('active');
             });
-            // Tampilkan history jika ada
             if (allHistoryData.length > 0) {
                 renderHistory(allHistoryData);
                 if (loadingHistory) loadingHistory.style.display = 'none';
@@ -788,9 +804,12 @@ function initKasEvents() {
         }
     });
 
-    // Navigasi bulan
+    // 🔥 NAVIGASI BULAN - DENGAN CEK AGAAR TIDAK DOUBLE
     if (prevBtn) {
         prevBtn.addEventListener('click', function() {
+            if (isNavigating || isFetching) return;
+            isNavigating = true;
+            
             let idx = -1;
             for (let i = 0; i < availableMonths.length; i++) {
                 if (availableMonths[i].tahun === currentTahun && availableMonths[i].bulan === currentBulan) {
@@ -801,14 +820,20 @@ function initKasEvents() {
             if (idx > 0) {
                 currentTahun = availableMonths[idx - 1].tahun;
                 currentBulan = availableMonths[idx - 1].bulan;
+                // 🔥 UPDATE LABEL DULU SEBELUM LOAD DATA
                 if (monthLabel) monthLabel.textContent = availableMonths[idx - 1].label;
                 loadData();
+            } else {
+                isNavigating = false;
             }
         });
     }
 
     if (nextBtn) {
         nextBtn.addEventListener('click', function() {
+            if (isNavigating || isFetching) return;
+            isNavigating = true;
+            
             let idx = -1;
             for (let i = 0; i < availableMonths.length; i++) {
                 if (availableMonths[i].tahun === currentTahun && availableMonths[i].bulan === currentBulan) {
@@ -819,8 +844,11 @@ function initKasEvents() {
             if (idx < availableMonths.length - 1 && idx !== -1) {
                 currentTahun = availableMonths[idx + 1].tahun;
                 currentBulan = availableMonths[idx + 1].bulan;
+                // 🔥 UPDATE LABEL DULU SEBELUM LOAD DATA
                 if (monthLabel) monthLabel.textContent = availableMonths[idx + 1].label;
                 loadData();
+            } else {
+                isNavigating = false;
             }
         });
     }
@@ -873,7 +901,6 @@ window.currentTahun = currentTahun;
 window.currentBulan = currentBulan;
 
 // ==================== INIT ====================
-// Preload setelah render
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(preloadPrevMonth, 500);
 });
