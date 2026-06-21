@@ -1,8 +1,8 @@
 /* ==========================================
-   KOTAK SARAN
+   SARAN POPUP - OVERLAY DI ATAS KONTEN
    ========================================== */
-.saran-overlay {
-    position: absolute;
+.saran-popup-overlay {
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
@@ -11,24 +11,25 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: rgba(11, 14, 26, 0.6);
+    background: rgba(11, 14, 26, 0.0);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    z-index: 150;
+    animation: fadeIn 0.25s ease;
 }
 
-.saran-container {
+.saran-popup-container {
     max-width: 450px;
     width: 100%;
     background: var(--bg-solid-form);
     border: 1px solid var(--border-line);
     border-radius: 16px;
-    box-shadow: 0 0 60px rgba(168, 85, 247, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
     overflow: hidden;
-    animation: fadeIn 0.3s ease-out;
-    margin: auto;
+    animation: slideUp 0.3s ease;
 }
 
-.saran-header {
+.saran-popup-header {
     background: var(--bg-solid-form);
     padding: 18px 20px;
     text-align: center;
@@ -36,7 +37,7 @@
     position: relative;
 }
 
-.saran-header .saran-close-btn {
+.saran-popup-header .saran-popup-close {
     position: absolute;
     top: 50%;
     right: 16px;
@@ -50,28 +51,28 @@
     padding: 4px 8px;
     line-height: 1;
 }
-.saran-header .saran-close-btn:hover {
+.saran-popup-header .saran-popup-close:hover {
     color: var(--color-primary);
 }
 
-.saran-header h2 {
+.saran-popup-header h2 {
     color: var(--color-primary);
     font-size: 1.2rem;
     letter-spacing: 1px;
     margin-bottom: 4px;
 }
-.saran-header p {
+.saran-popup-header p {
     color: var(--text-muted);
     font-size: 0.75rem;
 }
 
-.saran-body {
+.saran-popup-body {
     padding: 20px 24px;
 }
-.saran-body .input-group {
+.saran-popup-body .input-group {
     margin-bottom: 16px;
 }
-.saran-body .input-group label {
+.saran-popup-body .input-group label {
     display: block;
     font-size: 0.7rem;
     color: var(--text-muted);
@@ -79,9 +80,9 @@
     margin-bottom: 6px;
     text-transform: uppercase;
 }
-.saran-body .input-group textarea {
+.saran-popup-body .input-group textarea {
     width: 100%;
-    background: #07060a;
+    background: #1e2538;
     border: 1px solid var(--border-line);
     border-radius: 10px;
     padding: 12px 16px;
@@ -93,11 +94,11 @@
     resize: vertical;
     min-height: 100px;
 }
-.saran-body .input-group textarea:focus {
+.saran-popup-body .input-group textarea:focus {
     border-color: var(--color-primary);
     box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
 }
-.saran-body .send-btn {
+.saran-popup-body .send-btn {
     width: 100%;
     background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
     border: none;
@@ -114,50 +115,134 @@
     justify-content: center;
     gap: 8px;
 }
-.saran-body .send-btn:active {
+.saran-popup-body .send-btn:active {
     transform: scale(0.97);
 }
-.saran-body .send-btn:disabled {
+.saran-popup-body .send-btn:disabled {
     opacity: 0.6;
     transform: none;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.96); }
-    to { opacity: 1; transform: scale(1); }
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(30px) scale(0.96); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 /* ==========================================
    RESPONSIVE SARAN
    ========================================== */
 @media (max-width: 480px) {
-    .saran-overlay {
+    .saran-popup-overlay {
         padding: 10px;
     }
-    .saran-container {
+    .saran-popup-container {
         border-radius: 12px;
         margin: auto;
     }
-    .saran-header {
+    .saran-popup-header {
         padding: 14px 16px;
     }
-    .saran-header .saran-close-btn {
+    .saran-popup-header .saran-popup-close {
         right: 12px;
         font-size: 18px;
     }
-    .saran-header h2 {
+    .saran-popup-header h2 {
         font-size: 1rem;
     }
-    .saran-body {
+    .saran-popup-body {
         padding: 16px 18px;
     }
-    .saran-body .input-group textarea {
+    .saran-popup-body .input-group textarea {
         font-size: 0.8rem;
         padding: 10px 12px;
         min-height: 80px;
     }
-    .saran-body .send-btn {
+    .saran-popup-body .send-btn {
         padding: 12px;
         font-size: 0.8rem;
+    }
+}
+
+@media (min-width: 600px) and (max-height: 500px) {
+    .saran-popup-overlay {
+        padding: 8px;
+    }
+    .saran-popup-container {
+        max-width: 100%;
+        border-radius: 10px;
+    }
+    .saran-popup-header {
+        padding: 10px 16px;
+    }
+    .saran-popup-header h2 {
+        font-size: 1rem;
+    }
+    .saran-popup-header .saran-popup-close {
+        right: 12px;
+        font-size: 16px;
+    }
+    .saran-popup-body {
+        padding: 12px 16px;
+    }
+    .saran-popup-body .input-group {
+        margin-bottom: 10px;
+    }
+    .saran-popup-body .input-group textarea {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        min-height: 60px;
+    }
+    .saran-popup-body .send-btn {
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 600px) and (max-height: 400px) {
+    .saran-popup-overlay {
+        padding: 4px;
+    }
+    .saran-popup-container {
+        max-width: 100%;
+        border-radius: 8px;
+    }
+    .saran-popup-header {
+        padding: 6px 12px;
+    }
+    .saran-popup-header h2 {
+        font-size: 0.85rem;
+    }
+    .saran-popup-header p {
+        font-size: 0.6rem;
+    }
+    .saran-popup-header .saran-popup-close {
+        right: 8px;
+        font-size: 14px;
+    }
+    .saran-popup-body {
+        padding: 8px 12px;
+    }
+    .saran-popup-body .input-group {
+        margin-bottom: 6px;
+    }
+    .saran-popup-body .input-group label {
+        font-size: 0.6rem;
+        margin-bottom: 3px;
+    }
+    .saran-popup-body .input-group textarea {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+        border-radius: 6px;
+        min-height: 40px;
+    }
+    .saran-popup-body .send-btn {
+        padding: 8px;
+        font-size: 0.75rem;
+        border-radius: 6px;
     }
 }
