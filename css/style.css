@@ -1,0 +1,218 @@
+/* ==========================================
+   ROOT VARIABLES
+   ========================================== */
+:root {
+    --color-primary: #a855f7;
+    --color-primary-dark: #7c3aed;
+    --bg-dark: #0b0e1a;
+    --bg-solid-form: #141824;
+    --border-line: #2a2f45;
+    --text-main: #e0e0e0;
+    --text-muted: #8892b0;
+    --text-dim: #4a5270;
+    --color-positive: #4ade80;
+    --color-negative: #f87171;
+}
+
+/* ==========================================
+   RESET & GLOBAL
+   ========================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* ==========================================
+   MAIN CONTENT
+   ========================================== */
+.main-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========================================
+   FLOATING MENU
+   ========================================== */
+.menu-float {
+    position: fixed;
+    top: 14px;
+    right: 16px;
+    z-index: 50;
+    background: transparent;
+    backdrop-filter: blur(6px);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: 0.2s;
+}
+.menu-float:hover {
+    background: #1e2538;
+    transform: scale(1.05);
+}
+
+.menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+}
+.menu-overlay.open {
+    display: block;
+}
+
+.menu-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 270px;
+    height: 100%;
+    background: var(--bg-solid-form);
+    border-left: 2px solid var(--border-line);
+    padding: 30px 20px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 101;
+    overflow-y: auto;
+}
+.menu-panel.open {
+    transform: translateX(0);
+}
+.menu-panel .close-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 24px;
+    cursor: pointer;
+    float: right;
+}
+.menu-panel ul {
+    list-style: none;
+    margin-top: 40px;
+}
+.menu-panel ul li {
+    padding: 14px 0;
+    border-bottom: 1px solid #1e2538;
+    font-size: 16px;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+.menu-panel ul li.active {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+.menu-panel ul li:hover {
+    color: var(--color-primary);
+}
+
+/* ==========================================
+   TOAST
+   ========================================== */
+.toast-message {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 7, 18, 0.98);
+    border: 1px solid var(--color-primary);
+    padding: 10px 20px;
+    border-radius: 40px;
+    color: white;
+    font-size: 0.75rem;
+    z-index: 1000;
+    transition: bottom 0.3s ease;
+    white-space: nowrap;
+}
+.toast-message.show {
+    bottom: 30px;
+}
+
+/* ==========================================
+   SEGERA HADIR (Default)
+   ========================================== */
+.segera-hadir {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    gap: 16px;
+}
+.segera-hadir i {
+    font-size: 64px;
+    color: var(--color-primary);
+    opacity: 0.5;
+}
+.segera-hadir h2 {
+    font-size: 24px;
+    font-weight: 300;
+}
+.segera-hadir p {
+    font-size: 14px;
+    opacity: 0.6;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (max-width: 480px) {
+    .menu-panel {
+        width: 200px;
+        padding: 16px 14px;
+    }
+    .menu-panel ul li {
+        font-size: 14px;
+        padding: 10px 0;
+    }
+    .menu-float {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+        top: 10px;
+        right: 10px;
+    }
+}
+
+/* ==========================================
+   SCROLLBAR
+   ========================================== */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+::-webkit-scrollbar-track {
+    background: #10141f;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-line);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #3a405b;
+}
