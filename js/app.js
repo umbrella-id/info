@@ -20,7 +20,7 @@ if (menuOverlay) menuOverlay.addEventListener('click', () => toggleMenu(false));
 
 // ==================== BACK BUTTON MANAGER ====================
 window.addEventListener('popstate', function(e) {
-    // 🔥 CEK POPUP SARAN
+    // CEK POPUP SARAN
     if (isSaranPopupOpen) {
         const popup = document.getElementById('saranPopupOverlay');
         if (popup && popup.style.display !== 'none') {
@@ -32,7 +32,7 @@ window.addEventListener('popstate', function(e) {
         }
     }
     
-    // 🔥 CEK POPUP DETAIL HISTORY
+    // CEK POPUP DETAIL HISTORY
     if (isDetailPopupOpen) {
         const popupOverlay = document.getElementById('popupOverlay');
         if (popupOverlay && popupOverlay.classList.contains('active')) {
@@ -64,6 +64,7 @@ document.querySelectorAll('.menu-panel ul li').forEach(function(item) {
         const page = this.dataset.page;
         toggleMenu(false);
 
+        // 🔥 SIMPAN TAB TERAKHIR (KECUALI SARAN)
         if (page !== 'saran') {
             lastActiveTab = page;
         }
