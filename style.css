@@ -12,6 +12,10 @@
     --text-dim: #4a5270;
     --color-positive: #4ade80;
     --color-negative: #f87171;
+    --font-size-base: 12px;
+    --font-size-sm: 11px;
+    --font-size-xs: 10px;
+    --font-size-header: 10px;
 }
 
 /* ==========================================
@@ -152,8 +156,9 @@ body {
     color: var(--text-muted);
 }
 .header-kas .saldo-utama .tarif span {
-    color: #ffffff ;
+    color: #ffffff;
     font-size: 15px;
+    font-weight: 600;
 }
 .header-kas .bendahara-list {
     display: flex;
@@ -316,140 +321,223 @@ body {
 }
 
 /* ==========================================
-   TABLE LAPORAN KAS
+   TABLE LAPORAN KAS & HISTORY - UNIFIED STYLE
    ========================================== */
-.table-wrap {
+
+/* Container tabel */
+.table-wrap,
+.history-wrap {
     overflow: auto;
     border-radius: 8px;
     border: 1px solid var(--border-line);
     background: #10141f;
 }
+
+/* Style dasar tabel - SAMA UNTUK KAS & HISTORY */
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 12px;
+    font-size: var(--font-size-base);
     min-width: 480px;
 }
+
+/* Header tabel - SAMA */
 thead {
     background: #1a1f2e;
     position: sticky;
     top: 0;
     z-index: 2;
 }
+
 th {
-    padding: 6px 6px;
+    padding: 6px 8px;
     text-align: left;
     font-weight: 600;
     color: var(--text-muted);
     border-bottom: 2px solid var(--border-line);
     white-space: nowrap;
-    font-size: 10px;
+    font-size: var(--font-size-header);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
-/* ===== KOLOM TABEL ===== */
-/* Semua header tabel tetap abu-abu */
-th {
-    color: var(--text-muted) !important;
+/* Cell body - SAMA */
+td {
+    padding: 5px 8px;
+    border-bottom: 1px solid #1e2538;
+    vertical-align: middle;
+    font-size: var(--font-size-base);
+    line-height: 1.4;
 }
 
-/* Kecuali untuk header # dan IGN tetap abu-abu */
-th.col-no,
-th.col-ign,
-th.centang-header,
-th.deposit-header,
-th.estimasi-header {
-    color: var(--text-muted) !important;
+tr:hover {
+    background: #1a1f2e;
 }
 
-th.col-no,
-td.col-no {
+/* ==========================================
+   KOLOM KHUSUS LAPORAN KAS
+   ========================================== */
+
+/* Nomor urut */
+#tableBody td:first-child {
+    color: #5a6488;
+    font-size: var(--font-size-sm);
+    text-align: center;
     width: 36px;
     min-width: 36px;
     max-width: 36px;
-    text-align: center;
-}
-td.col-no {
-    color: #5a6488;
-    font-size: 11px;
 }
 
-/* IGN - Tebal seperti history */
+/* IGN - Tebal */
 #tableBody td.ign {
     font-weight: 700 !important;
     color: #ffffff !important;
     white-space: nowrap;
 }
 
-/* Centang - Hijau untuk paid */
-#tableBody td .paid {
-    color: var(--color-primary);
-    font-size: 13px !important;
-}
-
-/* Centang - Merah untuk unpaid */
-#tableBody td .unpaid {
-    color: var(--text-dim);
-    font-size: 13px !important;
-}
-
-/* Centang - Redup untuk empty (strip) */
-#tableBody td .empty {
-    color: #4a5270 !important;
-    opacity: 0.3 !important;
-}
-
-/* Cell centang */
+/* Centang */
 #tableBody td.centang-cell {
     text-align: center !important;
     padding: 4px 2px !important;
 }
 
-/* Deposit - Rata kanan, hijau, tebal */
+#tableBody td .paid {
+    color: var(--color-positive);
+    font-size: 14px !important;
+}
+
+#tableBody td .unpaid {
+    color: var(--color-negative);
+    font-size: 14px !important;
+}
+
+#tableBody td .empty {
+    color: var(--text-dim);
+    opacity: 0.3 !important;
+}
+
+/* Deposit */
 #tableBody td.deposit {
     text-align: right !important;
     font-weight: 700 !important;
-    font-size: 13px !important;
-    color: #4ade80 !important;
+    font-size: var(--font-size-base) !important;
+    color: var(--color-positive) !important;
     padding-right: 12px !important;
 }
 
-/* Estimasi - Rata kiri, redup seperti admin di history */
+/* Estimasi */
 #tableBody td.estimasi {
     text-align: left !important;
     font-weight: 400 !important;
-    font-size: 12px !important;
-    color:var(--text-muted) ;
+    font-size: var(--font-size-sm) !important;
+    color: var(--text-dim) !important;
     padding-left: 12px !important;
 }
 
-/* Header deposit dan estimasi tetap abu-abu */
+/* Header khusus kas */
 th.deposit-header {
     text-align: right !important;
-    color: var(--text-muted) !important;
     padding-right: 12px !important;
 }
 
 th.estimasi-header {
     text-align: left !important;
-    color: var(--text-muted) !important;
     padding-left: 12px !important;
 }
 
-/* Header centang */
 th.centang-header {
     text-align: center !important;
-    font-size: 9px !important;
-    color: var(--text-muted) !important;
 }
 
-td {
-    padding: 4px 6px;
-    border-bottom: 1px solid #1e2538;
-    vertical-align: middle;
-    font-size: 12px;
+/* ==========================================
+   KOLOM KHUSUS HISTORY
+   ========================================== */
+
+.history-wrap .col-date {
+    width: 90px;
+    min-width: 90px;
+    max-width: 90px;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
 }
-tr:hover {
+
+.history-wrap .col-ign {
+    font-weight: 700 !important;
+    color: #ffffff !important;
+}
+
+.history-wrap .col-amount {
+    text-align: right;
+    font-weight: 600;
+    font-family: monospace;
+    font-size: var(--font-size-base);
+    padding-right: 12px;
+}
+
+.history-wrap .col-amount.spina-positive {
+    color: var(--color-positive);
+}
+
+.history-wrap .col-amount.spina-negative {
+    color: var(--color-negative);
+}
+
+.history-wrap .col-notes {
+    color: var(--text-muted);
+    max-width: 200px;
+    font-size: var(--font-size-sm);
+}
+
+.history-wrap .col-admin {
+    color: var(--text-dim);
+    font-size: var(--font-size-sm);
+}
+
+/* ==========================================
+   HEADER HISTORY - SAMA DENGAN KAS
+   ========================================== */
+.history-wrap table th {
     background: #1a1f2e;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    font-size: var(--font-size-header);
+    padding: 6px 8px;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border-line);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.history-wrap table th.amount-header {
+    text-align: right;
+    padding-right: 12px;
+}
+
+/* ==========================================
+   SEARCH BOX - SAMA UNTUK KAS & HISTORY
+   ========================================== */
+.month-nav .search-box input,
+.history-search input {
+    width: 100%;
+    background: #1e2538;
+    border: 1px solid var(--border-line);
+    padding: 5px 10px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: var(--font-size-sm);
+    font-family: inherit;
+}
+
+.month-nav .search-box input::placeholder,
+.history-search input::placeholder {
+    color: var(--text-muted);
+}
+
+.history-search {
+    padding: 0 10px;
+    margin-top: 8px;
 }
 
 /* ==========================================
@@ -460,16 +548,6 @@ tr:hover {
     background: #1a1f2e;
     animation: pulse 1.2s ease-in-out infinite;
 }
-.skeleton-row td.col-no {
-    width: 36px;
-    min-width: 36px;
-    max-width: 36px;
-}
-.skeleton-row td.centang-cell {
-    width: 8%;
-    min-width: 28px;
-    max-width: 48px;
-}
 @keyframes pulse {
     0%,
     100% {
@@ -478,100 +556,6 @@ tr:hover {
     50% {
         opacity: 0.8;
     }
-}
-
-/* ==========================================
-   HISTORY
-   ========================================== */
-.history-wrap {
-    overflow: auto;
-    border-radius: 8px;
-    border: 1px solid var(--border-line);
-    background: #10141f;
-}
-.history-wrap table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-    min-width: 520px;
-}
-.history-wrap table th {
-    background: #1a1f2e;
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    font-size: 10px;
-    padding: 6px 8px;
-    color: var(--text-muted);
-    border-bottom: 2px solid var(--border-line);
-    font-weight: 600;
-}
-.history-wrap table th.amount-header {
-    text-align: right;
-}
-.history-wrap table td {
-    padding: 4px 8px;
-    border-bottom: 1px solid #1e2538;
-    vertical-align: middle;
-    font-size: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.history-wrap tr:hover {
-    background: #1a1f2e;
-}
-
-.history-wrap .col-date {
-    width: 90px;
-    min-width: 90px;
-    max-width: 90px;
-    color: var(--text-muted);
-    font-size: 11px;
-}
-.history-wrap .col-ign {
-    font-weight: 600;
-    color: #fff;
-}
-.history-wrap .col-amount {
-    width: 160px;
-    min-width: 140px;
-    max-width: 180px;
-    text-align: right;
-    font-weight: 600;
-    font-family: monospace;
-    font-size: 13px;
-    padding-right: 12px;
-}
-.history-wrap .col-amount.spina-positive {
-    color: var(--color-positive);
-}
-.history-wrap .col-amount.spina-negative {
-    color: var(--color-negative);
-}
-.history-wrap .col-notes {
-    color: var(--text-muted);
-    max-width: 200px;
-}
-.history-wrap .col-admin {
-    width: 15%;
-    min-width: 80px;
-    max-width: 120px;
-    color: var(--text-muted);
-    font-size: 11px;
-}
-
-.history-search input {
-    width: 100%;
-    background: #1e2538;
-    border: 1px solid var(--border-line);
-    padding: 4px 10px;
-    border-radius: 6px;
-    color: #fff;
-    font-size: 12px;
-}
-.history-search input::placeholder {
-    color: var(--text-muted);
 }
 
 /* ==========================================
@@ -676,7 +660,8 @@ tr:hover {
         margin: 4px 10px 10px;
     }
     .panel-history .history-search {
-        margin: 8px 10px 4px;
+        margin: 4px 10px 4px;
+        padding: 0;
     }
     .panel-history .history-wrap {
         margin: 4px 10px 10px;
@@ -684,19 +669,21 @@ tr:hover {
     .month-nav .search-box {
         min-width: 80px;
     }
+
     table {
         font-size: 11px;
         min-width: 400px;
     }
     th,
     td {
-        padding: 3px 4px;
+        padding: 4px 6px;
     }
     th.centang-header,
     td.centang-cell {
         min-width: 24px;
         max-width: 36px;
     }
+
     #tableBody td .paid,
     #tableBody td .unpaid {
         font-size: 12px !important;
@@ -709,20 +696,7 @@ tr:hover {
         font-size: 10px !important;
         padding-left: 6px !important;
     }
-    th.deposit-header {
-        padding-right: 6px !important;
-    }
-    th.estimasi-header {
-        padding-left: 6px !important;
-    }
-    .history-wrap table {
-        min-width: 420px;
-        font-size: 11px;
-    }
-    .history-wrap table td {
-        padding: 3px 6px;
-        font-size: 10px;
-    }
+
     .history-wrap .col-date {
         width: 70px;
         min-width: 70px;
@@ -730,16 +704,11 @@ tr:hover {
         font-size: 10px;
     }
     .history-wrap .col-amount {
-        width: 110px;
-        min-width: 100px;
-        max-width: 130px;
         font-size: 11px;
         padding-right: 8px;
     }
     .history-wrap .col-admin {
-        width: 15%;
-        min-width: 60px;
-        max-width: 90px;
+        font-size: 10px;
     }
     .history-wrap .col-notes {
         max-width: 100px;
@@ -772,15 +741,14 @@ tr:hover {
         font-size: 12px;
         padding: 8px 8px;
     }
+
     table {
         font-size: 10px;
         min-width: 340px;
     }
-    th.col-no,
-    td.col-no {
-        width: 28px;
-        min-width: 28px;
-        max-width: 28px;
+    th,
+    td {
+        padding: 3px 4px;
     }
     th.centang-header,
     td.centang-cell {
@@ -788,6 +756,7 @@ tr:hover {
         max-width: 30px;
         padding: 2px 1px;
     }
+
     #tableBody td .paid,
     #tableBody td .unpaid {
         font-size: 10px !important;
@@ -800,20 +769,7 @@ tr:hover {
         font-size: 9px !important;
         padding-left: 4px !important;
     }
-    th.deposit-header {
-        padding-right: 4px !important;
-    }
-    th.estimasi-header {
-        padding-left: 4px !important;
-    }
-    .history-wrap table {
-        min-width: 340px;
-        font-size: 10px;
-    }
-    .history-wrap table td {
-        padding: 2px 4px;
-        font-size: 9px;
-    }
+
     .history-wrap .col-date {
         width: 60px;
         min-width: 60px;
@@ -821,21 +777,16 @@ tr:hover {
         font-size: 9px;
     }
     .history-wrap .col-amount {
-        width: 80px;
-        min-width: 70px;
-        max-width: 100px;
         font-size: 10px;
         padding-right: 4px;
     }
     .history-wrap .col-admin {
-        width: 15%;
-        min-width: 50px;
-        max-width: 70px;
         font-size: 9px;
     }
     .history-wrap .col-notes {
         max-width: 60px;
     }
+
     .menu-panel {
         width: 200px;
         padding: 16px 14px;
