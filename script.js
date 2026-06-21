@@ -410,11 +410,11 @@ function renderHistory(data) {
         const spinaClass = spina >= 0 ? 'spina-positive' : 'spina-negative';
         const spinaFormatted = (spina >= 0 ? '+' : '') + formatSpinaRaw(spina) + ' S';
         
-        html += '<tr>';
+        html += '<tr data-index="' + (data.indexOf(item)) + '">';
         html += '<td class="col-date">' + dateStr + '</td>';
         html += '<td class="col-ign">' + (item.ign || '-') + '</td>';
         html += '<td class="col-amount ' + spinaClass + '">' + spinaFormatted + '</td>';
-        html += '<td class="col-notes" data-notes="' + (item.notes || '').replace(/"/g, '&quot;') + '">' + (item.notes || '-') + '</td>';
+        html += '<td class="col-notes">' + (item.notes || '-') + '</td>';
         html += '<td class="col-admin">' + (item.adm || '-') + '</td>';
         html += '</tr>';
     }
@@ -447,7 +447,7 @@ function initPopup() {
                         <span class="value" id="popupAdmin">-</span>
                     </div>
                     <hr class="popup-divider" />
-                    <div class="popup-title" style="font-size:11px; margin-bottom:6px;">📋 Catatan Lengkap</div>
+                    <div class="popup-title" style="font-size:11px; margin-bottom:6px;">📋 Catatan</div>
                     <div class="popup-notes" id="popupNotes">-</div>
                 </div>
             </div>
@@ -463,19 +463,22 @@ function initPopup() {
     const popupAdmin = document.getElementById('popupAdmin');
     const popupNotes = document.getElementById('popupNotes');
 
+    // Track history state untuk back button
+    let popupHistory = [];
+
     function closePopup() {
         popupOverlay.classList.remove('active');
+        // Hapus dari history state
+        if (popupHistory.length > 0) {
+            popupHistory.pop();
+            // Update URL hash jika perlu
+            if (popupHistory.length === 0) {
+                history.replaceState(null, null, ' ');
+            }
+        }
     }
 
-    popupClose.addEventListener('click', closePopup);
-    popupOverlay.addEventListener('click', function(e) {
-        if (e.target === this) closePopup();
-    });
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closePopup();
-    });
-
-    window.openPopup = function(item) {
+    function openPopup(item) {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
         const date = new Date(item.date);
         const dateStr = String(date.getDate()).padStart(2, '0') + '-' + 
@@ -494,39 +497,66 @@ function initPopup() {
         popupNotes.textContent = item.notes || 'Tidak ada catatan';
         
         popupOverlay.classList.add('active');
-    };
+        
+        // Push ke history untuk back button support
+        popupHistory.push('popup');
+        history.pushState({ popup: true }, null, '#popup');
+    }
 
-    // Event listener untuk klik pada kolom notes
+    // Event listeners
+    popupClose.addEventListener('click', closePopup);
+    popupOverlay.addEventListener('click', function(e) {
+        if (e.target === this) closePopup();
+    });
+
+    // 🔥 BACK BUTTON ANDROID SUPPORT
+    window.addEventListener('popstate', function(e) {
+        if (popupOverlay.classList.contains('active')) {
+            closePopup();
+            e.preventDefault();
+        }
+    });
+
+    // Keyboard Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && popupOverlay.classList.contains('active')) {
+            closePopup();
+        }
+    });
+
+    // Expose functions
+    window.openPopup = openPopup;
+    window.closePopup = closePopup;
+
+    // ==================== EVENT CLICK ROW ====================
+    // Event listener untuk klik pada seluruh row history
     document.addEventListener('click', function(e) {
-        const notesCell = e.target.closest('.col-notes');
-        if (notesCell) {
-            const row = notesCell.closest('tr');
-            if (row) {
-                const cells = row.querySelectorAll('td');
-                if (cells.length >= 5) {
-                    // Ambil data dari data attribute atau text
-                    const notes = notesCell.getAttribute('data-notes') || notesCell.textContent.trim();
-                    const item = {
-                        date: cells[0].textContent.trim(),
-                        ign: cells[1].textContent.trim(),
-                        spina: parseFloat(cells[2].textContent.replace(/[^0-9\-]/g, '')) || 0,
-                        notes: notes,
-                        adm: cells[4].textContent.trim()
-                    };
-                    
-                    // Konversi date string ke format yang bisa diparse
-                    const parts = item.date.split('-');
-                    if (parts.length === 3) {
-                        const monthMap = {'Jan':0,'Feb':1,'Mar':2,'Apr':3,'Mei':4,'Jun':5,'Jul':6,'Agu':7,'Sep':8,'Okt':9,'Nov':10,'Des':11};
-                        const year = 2000 + parseInt(parts[2]);
-                        const month = monthMap[parts[1]] || 0;
-                        const day = parseInt(parts[0]);
-                        item.date = new Date(year, month, day).toISOString();
-                    }
-                    
-                    if (window.openPopup) {
-                        window.openPopup(item);
-                    }
+        // Cari apakah yang diklik adalah row di tabel history (atau child di dalamnya)
+        const row = e.target.closest('#historyBody tr');
+        if (row) {
+            // Ambil data dari row
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 5) {
+                const item = {
+                    date: cells[0].textContent.trim(),
+                    ign: cells[1].textContent.trim(),
+                    spina: parseFloat(cells[2].textContent.replace(/[^0-9\-]/g, '')) || 0,
+                    notes: cells[3].textContent.trim(),
+                    adm: cells[4].textContent.trim()
+                };
+                
+                // Konversi date string ke format yang bisa diparse
+                const parts = item.date.split('-');
+                if (parts.length === 3) {
+                    const monthMap = {'Jan':0,'Feb':1,'Mar':2,'Apr':3,'Mei':4,'Jun':5,'Jul':6,'Agu':7,'Sep':8,'Okt':9,'Nov':10,'Des':11};
+                    const year = 2000 + parseInt(parts[2]);
+                    const month = monthMap[parts[1]] || 0;
+                    const day = parseInt(parts[0]);
+                    item.date = new Date(year, month, day).toISOString();
+                }
+                
+                if (window.openPopup) {
+                    window.openPopup(item);
                 }
             }
         }
@@ -726,9 +756,7 @@ document.addEventListener('DOMContentLoaded', function() {
         $('panelKas').classList.add('active');
     }
 
-    // Inisialisasi popup
     initPopup();
-
     loadData();
     setTimeout(preloadPrevMonth, 500);
 });
