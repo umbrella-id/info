@@ -1,0 +1,140 @@
+// ==================== KONFIGURASI SARAN ====================
+const GAS_MAIL_URL = "https://script.google.com/macros/s/AKfycbyv6cBEWlT9JsprJqdRVG2EiqRYrNlyu6uHxH6xuFG9PRXSwkO6aKi8-EHXm99puRQX/exec";
+
+// ==================== STATE SARAN ====================
+let isSendingSaran = false;
+let myUID = localStorage.getItem('u_uid_saran');
+if (!myUID) {
+    myUID = 'SARAN-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+    localStorage.setItem('u_uid_saran', myUID);
+}
+
+// ==================== RENDER SARAN ====================
+function renderSaran() {
+    const mainContent = document.getElementById('mainContent');
+    if (!mainContent) return;
+
+    mainContent.innerHTML = `
+        <div class="saran-overlay">
+            <div class="saran-container">
+                <div class="saran-header">
+                    <button class="saran-close-btn" id="saranCloseBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h2><i class="fas fa-envelope"></i> KIRIM SARAN</h2>
+                    <p>Kritik, saran, atau aspirasi Anda sangat berharga</p>
+                </div>
+                <div class="saran-body">
+                    <div class="input-group">
+                        <label><i class="fas fa-pen"></i> PESAN ANDA</label>
+                        <textarea id="saranMessage" placeholder="Tulis saran, kritik, atau aspirasi Anda untuk perkembangan guild Umbrella..."></textarea>
+                    </div>
+                    <button class="send-btn" id="saranSendBtn">
+                        <i class="fas fa-paper-plane"></i> KIRIM SEKARANG
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    initSaranEvents();
+}
+
+// ==================== CLOSE SARAN ====================
+function closeSaran() {
+    const mainContent = document.getElementById('mainContent');
+    if (mainContent) {
+        mainContent.innerHTML = '';
+    }
+
+    // Kembali ke laporan kas
+    if (typeof renderLaporan === 'function') {
+        renderLaporan();
+    }
+}
+
+// ==================== RESET SARAN FORM ====================
+function resetSaranForm() {
+    const msgEl = document.getElementById('saranMessage');
+    if (msgEl) msgEl.value = '';
+}
+
+// ==================== INIT SARAN EVENTS ====================
+function initSaranEvents() {
+    const messageEl = document.getElementById('saranMessage');
+    const sendBtn = document.getElementById('saranSendBtn');
+    const closeBtn = document.getElementById('saranCloseBtn');
+    const toast = document.getElementById('toastMessage');
+
+    function showToastSaran(msg, isError) {
+        isError = isError || false;
+        toast.innerText = msg;
+        toast.style.borderColor = isError ? '#ff4444' : '#a855f7';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function sendSaran() {
+        if (isSendingSaran) return;
+
+        const pesan = messageEl.value.trim();
+
+        if (!pesan) {
+            showToastSaran('⚠️ Pesan tidak boleh kosong!', true);
+            messageEl.focus();
+            return;
+        }
+
+        isSendingSaran = true;
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> MENGIRIM...';
+
+        const kategori = 'Saran';
+        const url = GAS_MAIL_URL + '?uid=' + encodeURIComponent(myUID) + '&ign=Member&msg=' + encodeURIComponent(pesan) + '&category=' + encodeURIComponent(kategori) + '&type=mail';
+
+        fetch(url)
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showToastSaran('✅ Surat berhasil dikirim! Terima kasih.');
+                    setTimeout(() => {
+                        resetSaranForm();
+                        closeSaran();
+                        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> KIRIM SEKARANG';
+                        sendBtn.disabled = false;
+                        isSendingSaran = false;
+                    }, 1000);
+                } else {
+                    showToastSaran('⚠️ Gagal: ' + (data.message || 'Sistem error'), true);
+                    sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> KIRIM SEKARANG';
+                    sendBtn.disabled = false;
+                    isSendingSaran = false;
+                }
+            })
+            .catch(e => {
+                showToastSaran('🚨 Koneksi gagal! Coba lagi.', true);
+                sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> KIRIM SEKARANG';
+                sendBtn.disabled = false;
+                isSendingSaran = false;
+                console.error(e);
+            });
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeSaran);
+    if (sendBtn) sendBtn.addEventListener('click', sendSaran);
+    if (messageEl) {
+        messageEl.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendSaran();
+            }
+        });
+    }
+
+    console.log("✅ Kotak Saran terintegrasi");
+}
+
+// ==================== EXPOSE ====================
+window.renderSaran = renderSaran;
+window.closeSaran = closeSaran;
+window.resetSaranForm = resetSaranForm;
