@@ -5,7 +5,9 @@ const menuPanel = document.getElementById('menuPanel');
 const menuClose = document.getElementById('menuClose');
 
 // ==================== STATE ====================
-let lastActiveTab = 'laporan'; // Default ke laporan
+let lastActiveTab = 'laporan';
+let isSaranPopupOpen = false;
+let isDetailPopupOpen = false;
 
 function toggleMenu(open) {
     if (menuOverlay) menuOverlay.classList.toggle('open', open);
@@ -15,6 +17,42 @@ function toggleMenu(open) {
 if (menuToggle) menuToggle.addEventListener('click', () => toggleMenu(true));
 if (menuClose) menuClose.addEventListener('click', () => toggleMenu(false));
 if (menuOverlay) menuOverlay.addEventListener('click', () => toggleMenu(false));
+
+// ==================== BACK BUTTON MANAGER ====================
+window.addEventListener('popstate', function(e) {
+    // 🔥 CEK POPUP SARAN
+    if (isSaranPopupOpen) {
+        const popup = document.getElementById('saranPopupOverlay');
+        if (popup && popup.style.display !== 'none') {
+            if (typeof closeSaran === 'function') {
+                closeSaran();
+                e.preventDefault();
+                return;
+            }
+        }
+    }
+    
+    // 🔥 CEK POPUP DETAIL HISTORY
+    if (isDetailPopupOpen) {
+        const popupOverlay = document.getElementById('popupOverlay');
+        if (popupOverlay && popupOverlay.classList.contains('active')) {
+            if (typeof window.closePopup === 'function') {
+                window.closePopup();
+                e.preventDefault();
+                return;
+            }
+        }
+    }
+});
+
+// ==================== EXPOSE BACK BUTTON STATE ====================
+window.setSaranPopupOpen = function(open) {
+    isSaranPopupOpen = open;
+};
+
+window.setDetailPopupOpen = function(open) {
+    isDetailPopupOpen = open;
+};
 
 // ==================== NAVIGASI MENU ====================
 document.querySelectorAll('.menu-panel ul li').forEach(function(item) {
@@ -26,12 +64,10 @@ document.querySelectorAll('.menu-panel ul li').forEach(function(item) {
         const page = this.dataset.page;
         toggleMenu(false);
 
-        // Simpan tab terakhir (kecuali saran)
         if (page !== 'saran') {
             lastActiveTab = page;
         }
 
-        // Panggil fungsi render dari masing-masing menu
         if (page === 'laporan') {
             if (typeof renderLaporan === 'function') {
                 renderLaporan();
@@ -51,7 +87,6 @@ document.querySelectorAll('.menu-panel ul li').forEach(function(item) {
 // ==================== DEFAULT RENDER ====================
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 APP STARTED');
-    // Default tampilkan laporan kas
     if (typeof renderLaporan === 'function') {
         renderLaporan();
     } else if (typeof renderSegera === 'function') {
