@@ -55,7 +55,6 @@ body {
     right: 16px;
     z-index: 50;
     background: transparent;
-    backdrop-filter: blur(6px);
     width: 44px;
     height: 44px;
     display: flex;
@@ -67,7 +66,6 @@ body {
     transition: 0.2s;
 }
 .menu-float:hover {
-    background: #1e2538;
     transform: scale(1.05);
 }
 
@@ -176,6 +174,24 @@ body {
 .segera-hadir p {
     font-size: 14px;
     opacity: 0.6;
+}
+
+/* ==========================================
+   CRYSTA ICONS
+   ========================================== */
+.crysta-svg-icon {
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+    /* 🔥 HAPUS FILTER AGAR WARNA ASLI KELUAR */
+    /* filter: ...; */
+}
+
+.menu-panel ul li .crysta-svg-icon {
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    max-width: 16px !important;
 }
 
 /* ==========================================
