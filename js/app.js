@@ -54,6 +54,29 @@ window.setDetailPopupOpen = function(open) {
     isDetailPopupOpen = open;
 };
 
+// ==================== RENDER MENU ====================
+function renderMenu() {
+    var menuPanel = document.getElementById('menuPanel');
+    if (!menuPanel) return;
+    
+    var ul = menuPanel.querySelector('ul');
+    if (!ul) return;
+    
+    var items = ul.querySelectorAll('li');
+    for (var i = 0; i < items.length; i++) {
+        if (items[i].dataset.page === 'crysta') {
+            items[i].innerHTML = ciMenu(10) + ' Daftar Crysta';
+            items[i].className = '';
+            break;
+        }
+    }
+}
+
+// Panggil setelah DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+    renderMenu();
+});
+
 // ==================== NAVIGASI MENU ====================
 document.querySelectorAll('.menu-panel ul li').forEach(function(item) {
     item.addEventListener('click', function() {
@@ -67,11 +90,20 @@ document.querySelectorAll('.menu-panel ul li').forEach(function(item) {
         // 🔥 SIMPAN TAB TERAKHIR (KECUALI SARAN)
         if (page !== 'saran') {
             lastActiveTab = page;
+            
+            // 🔥 UPDATE JUGA KE WINDOW
+            if (window.setLastActiveTab) {
+                window.setLastActiveTab(page);
+            }
         }
 
         if (page === 'laporan') {
             if (typeof renderLaporan === 'function') {
                 renderLaporan();
+            }
+        } else if (page === 'crysta') {
+            if (typeof renderCrysta === 'function') {
+                renderCrysta();
             }
         } else if (page === 'saran') {
             if (typeof renderSaran === 'function') {
