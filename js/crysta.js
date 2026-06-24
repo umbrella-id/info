@@ -54,15 +54,27 @@ function setCrystaCache(value) {
 // ==================== LOAD CRYSTA DATA ====================
 function loadCrystaData(callback) {
     var cached = getCrystaCache();
+    
+    // 🔥 1. TAMPILKAN CACHE DULU (INSTANT)
     if (cached && cached.length > 0) {
         console.log('✅ CRYSTA: Load cache, jumlah:', cached.length);
         crystaRawData = cached;
         isDataLoaded = true;
+        // 🔥 RENDER SETELAH CACHE LOAD
+        if (typeof renderCrysta === 'function') {
+            renderCrysta();
+        }
         if (callback) callback();
     } else {
+        // 🔥 TIDAK ADA CACHE, TAMPILKAN LOADING
         isDataLoaded = false;
+        var mainContent = document.getElementById('mainContent');
+        if (mainContent) {
+            mainContent.innerHTML = '<div class="crysta-loading"><div class="spinner"></div><p>Memuat data crysta...</p></div>';
+        }
     }
     
+    // 🔥 2. FETCH DATA BARU DI BACKGROUND (UPDATE)
     fetch(CRYSTA_API_URL)
         .then(function(r) { 
             if (!r.ok) throw new Error('HTTP ' + r.status); 
@@ -74,6 +86,7 @@ function loadCrystaData(callback) {
                 crystaRawData = data.data;
                 setCrystaCache(crystaRawData);
                 isDataLoaded = true;
+                // 🔥 RENDER ULANG DENGAN DATA BARU
                 if (typeof renderCrysta === 'function') {
                     renderCrysta();
                 }
@@ -84,6 +97,9 @@ function loadCrystaData(callback) {
             if (!cached || cached.length === 0) {
                 crystaRawData = [];
                 isDataLoaded = true;
+                if (typeof renderCrysta === 'function') {
+                    renderCrysta();
+                }
                 if (callback) callback();
             }
         });
@@ -222,6 +238,7 @@ function renderCrysta() {
     if (isRendering) return;
     isRendering = true;
     
+    // 🔥 UPDATE LAST ACTIVE TAB
     if (window.setLastActiveTab) {
         window.setLastActiveTab('crysta');
     }
@@ -238,8 +255,8 @@ function renderCrysta() {
         return;
     }
 
-    if (!isDataLoaded) {
-        mainContent.innerHTML = '<div class="crysta-loading"><div class="spinner"></div><p>Memuat data...</p></div>';
+    if (!isDataLoaded || crystaRawData.length === 0) {
+        mainContent.innerHTML = '<div class="crysta-loading"><div class="spinner"></div><p>Memuat data crysta...</p></div>';
         loadCrystaData(function() {
             isRendering = false;
             renderCrysta();
