@@ -237,10 +237,16 @@ function isBaseNode(crystaName) {
 }
 
 // ==================== RENDER CRYSTA ====================
+// ==================== RENDER CRYSTA ====================
 function renderCrysta() {
-    console.log('🎨 renderCrysta() dipanggil, data length:', crystaRawData.length);
+    console.log('🎨 renderCrysta() START');
+    console.log('📊 isDataLoaded:', isDataLoaded);
+    console.log('📊 crystaRawData.length:', crystaRawData.length);
     
-    if (isRendering) return;
+    if (isRendering) {
+        console.log('⏳ Already rendering, skip');
+        return;
+    }
     isRendering = true;
     
     // UPDATE LAST ACTIVE TAB
@@ -256,12 +262,14 @@ function renderCrysta() {
     
     var mainContent = document.getElementById('mainContent');
     if (!mainContent) {
+        console.error('❌ mainContent NOT FOUND!');
         isRendering = false;
         return;
     }
+    console.log('✅ mainContent found');
 
     if (!isDataLoaded || crystaRawData.length === 0) {
-        console.log('⏳ Data belum siap, tampilkan loading');
+        console.log('⏳ Data not ready, show loading');
         mainContent.innerHTML = '<div class="crysta-loading"><div class="spinner"></div><p>Memuat data crysta...</p></div>';
         loadCrystaData(function() {
             isRendering = false;
@@ -270,8 +278,12 @@ function renderCrysta() {
         return;
     }
 
+    console.log('🔨 Building cards...');
     var allCards = buildCards();
-    console.log('📊 All cards:', allCards.length);
+    console.log('📊 allCards.length:', allCards.length);
+    if (allCards.length > 0) {
+        console.log('📊 Sample card:', allCards[0]);
+    }
     
     var cards = allCards;
     if (currentFilter !== 'all') {
@@ -282,6 +294,7 @@ function renderCrysta() {
             }
         }
         cards = filtered;
+        console.log('📊 After filter:', cards.length);
     }
     
     if (searchKeyword) {
@@ -323,6 +336,7 @@ function renderCrysta() {
             }
         }
         cards = searched;
+        console.log('📊 After search:', cards.length);
     }
 
     var typeOrder = ['weapon', 'armor', 'additional', 'special', 'normal'];
@@ -344,10 +358,14 @@ function renderCrysta() {
             totalCrysta++;
         }
     }
+    console.log('📊 totalCrysta:', totalCrysta);
 
+    // 🔥 CEK APAKAH INI RENDER PERTAMA
     var isFirstRender = (mainContent.innerHTML === '' || mainContent.innerHTML.indexOf('crysta-container') === -1);
+    console.log('📊 isFirstRender:', isFirstRender);
     
     if (isFirstRender) {
+        console.log('🏗️ Building HTML structure...');
         var html = '';
         html += '<div class="crysta-container">';
         html += '  <div class="crysta-header">';
@@ -377,6 +395,7 @@ function renderCrysta() {
         html += '</div>';
 
         mainContent.innerHTML = html;
+        console.log('✅ HTML structure built');
         
         var searchInput = document.getElementById('crystaSearchInput');
         if (searchInput) {
@@ -402,10 +421,13 @@ function renderCrysta() {
 
     var gridContainer = document.getElementById('crystaGridContainer');
     if (!gridContainer) {
+        console.error('❌ gridContainer NOT FOUND!');
         isRendering = false;
         return;
     }
+    console.log('✅ gridContainer found');
 
+    // HITUNG BARIS MAKSIMAL
     var maxBodyLength = 0;
     for (var c = 0; c < cards.length; c++) {
         var bodyLen = cards[c].body.length;
@@ -419,20 +441,25 @@ function renderCrysta() {
     var headerHeight = 42;
     var paddingHeight = 14;
     var minCardHeight = headerHeight + paddingHeight + (targetRows * rowHeight);
+    console.log('📊 targetRows:', targetRows, 'minCardHeight:', minCardHeight);
 
     var gridHtml = '';
+    console.log('🔨 Building cards HTML...');
 
     if (crystaRawData.length === 0) {
+        console.log('📭 crystaRawData empty');
         gridHtml += '    <div class="crysta-empty">';
         gridHtml += '      <i class="fas fa-database"></i>';
         gridHtml += '      <p>Belum ada data crysta di database.</p>';
         gridHtml += '    </div>';
     } else if (cards.length === 0) {
+        console.log('📭 cards empty');
         gridHtml += '    <div class="crysta-empty">';
         gridHtml += '      <i class="fas fa-box-open"></i>';
         gridHtml += '      <p>' + (searchKeyword ? 'Tidak ada hasil untuk "' + searchKeyword + '"' : 'Tidak ada crysta yang cocok') + '</p>';
         gridHtml += '    </div>';
     } else {
+        console.log('🏗️ Building ' + cards.length + ' cards...');
         for (var c = 0; c < cards.length; c++) {
             var card = cards[c];
             var headerName = card.header.crysta_name;
@@ -468,10 +495,12 @@ function renderCrysta() {
             gridHtml += '      </div>';
             gridHtml += '    </div>';
         }
+        console.log('✅ Cards HTML built, length:', gridHtml.length);
     }
 
+    console.log('📝 Setting gridContainer.innerHTML...');
     gridContainer.innerHTML = gridHtml;
-    console.log('✅ renderCrysta() selesai');
+    console.log('✅ renderCrysta() COMPLETE');
     
     isRendering = false;
 }
