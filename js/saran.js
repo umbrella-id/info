@@ -1,47 +1,46 @@
 // ==================== KONFIGURASI SARAN ====================
-const GAS_MAIL_URL = "https://script.google.com/macros/s/AKfycbyv6cBEWlT9JsprJqdRVG2EiqRYrNlyu6uHxH6xuFG9PRXSwkO6aKi8-EHXm99puRQX/exec";
+var GAS_MAIL_URL = "https://script.google.com/macros/s/AKfycbyv6cBEWlT9JsprJqdRVG2EiqRYrNlyu6uHxH6xuFG9PRXSwkO6aKi8-EHXm99puRQX/exec";
 
 // ==================== STATE SARAN ====================
-let isSendingSaran = false;
-let myUID = localStorage.getItem('u_uid_saran');
+var isSendingSaran = false;
+var myUID = localStorage.getItem('u_uid_saran');
 if (!myUID) {
     myUID = 'SARAN-' + Math.random().toString(36).substring(2, 10).toUpperCase();
     localStorage.setItem('u_uid_saran', myUID);
 }
-let saranPopupHistory = [];
+var saranPopupHistory = [];
 
 // ==================== RENDER SARAN ====================
 function renderSaran() {
     // Cek apakah popup sudah ada
     if (document.getElementById('saranPopupOverlay')) {
-        const popup = document.getElementById('saranPopupOverlay');
+        var popup = document.getElementById('saranPopupOverlay');
         popup.style.display = 'flex';
         return;
     }
 
     // Buat popup overlay di atas konten yang ada
-    const popupHTML = `
-        <div class="saran-popup-overlay" id="saranPopupOverlay">
-            <div class="saran-popup-container">
-                <div class="saran-popup-header">
-                    <button class="saran-popup-close" id="saranCloseBtn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <h2><i class="fas fa-envelope"></i> KIRIM SARAN</h2>
-                    <p>Kritik, saran, atau aspirasi Anda sangat berharga</p>
-                </div>
-                <div class="saran-popup-body">
-                    <div class="input-group">
-                        <label><i class="fas fa-pen"></i> PESAN ANDA</label>
-                        <textarea id="saranMessage" placeholder="Tulis saran, kritik, atau aspirasi Anda untuk perkembangan guild Umbrella..."></textarea>
-                    </div>
-                    <button class="send-btn" id="saranSendBtn">
-                        <i class="fas fa-paper-plane"></i> KIRIM SEKARANG
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
+    var popupHTML = '';
+    popupHTML += '<div class="saran-popup-overlay" id="saranPopupOverlay">';
+    popupHTML += '  <div class="saran-popup-container">';
+    popupHTML += '    <div class="saran-popup-header">';
+    popupHTML += '      <button class="saran-popup-close" id="saranCloseBtn">';
+    popupHTML += '        <i class="fas fa-times"></i>';
+    popupHTML += '      </button>';
+    popupHTML += '      <h2><i class="fas fa-envelope"></i> KIRIM SARAN</h2>';
+    popupHTML += '      <p>Kritik, saran, atau aspirasi Anda sangat berharga</p>';
+    popupHTML += '    </div>';
+    popupHTML += '    <div class="saran-popup-body">';
+    popupHTML += '      <div class="input-group">';
+    popupHTML += '        <label><i class="fas fa-pen"></i> PESAN ANDA</label>';
+    popupHTML += '        <textarea id="saranMessage" placeholder="Tulis saran, kritik, atau aspirasi Anda untuk perkembangan guild Umbrella..."></textarea>';
+    popupHTML += '      </div>';
+    popupHTML += '      <button class="send-btn" id="saranSendBtn">';
+    popupHTML += '        <i class="fas fa-paper-plane"></i> KIRIM SEKARANG';
+    popupHTML += '      </button>';
+    popupHTML += '    </div>';
+    popupHTML += '  </div>';
+    popupHTML += '</div>';
 
     document.body.insertAdjacentHTML('beforeend', popupHTML);
 
@@ -53,8 +52,8 @@ function renderSaran() {
     saranPopupHistory.push('saran');
     history.pushState({ saran: true }, null, '#saran');
 
-    // 🔥 SEMBUNYIKAN HEADER KAS
-    const headerKas = document.querySelector('.header-kas');
+    // SEMBUNYIKAN HEADER KAS
+    var headerKas = document.querySelector('.header-kas');
     if (headerKas) headerKas.style.display = 'none';
 
     initSaranEvents();
@@ -63,7 +62,7 @@ function renderSaran() {
 // ==================== CLOSE SARAN ====================
 function closeSaran() {
     // Hapus popup dari body
-    const popup = document.getElementById('saranPopupOverlay');
+    var popup = document.getElementById('saranPopupOverlay');
     if (popup) {
         popup.remove();
     }
@@ -79,22 +78,23 @@ function closeSaran() {
         }
     }
 
-    // 🔥 KEMBALI KE TAB SEBELUMNYA
-    const lastTab = window.getLastActiveTab ? window.getLastActiveTab() : 'laporan';
+    // KEMBALI KE TAB SEBELUMNYA
+    var lastTab = window.getLastActiveTab ? window.getLastActiveTab() : 'laporan';
     
-    // 🔥 UPDATE MENU AKTIF DI FLOATING PANEL
-    document.querySelectorAll('.menu-panel ul li').forEach(function(i) {
-        i.classList.remove('active');
-    });
-    const menuItem = document.querySelector('.menu-panel ul li[data-page="' + lastTab + '"]');
+    // UPDATE MENU AKTIF DI FLOATING PANEL
+    var menuItems = document.querySelectorAll('.menu-panel ul li');
+    for (var i = 0; i < menuItems.length; i++) {
+        menuItems[i].classList.remove('active');
+    }
+    var menuItem = document.querySelector('.menu-panel ul li[data-page="' + lastTab + '"]');
     if (menuItem) {
         menuItem.classList.add('active');
     } else {
-        const fallbackMenu = document.querySelector('.menu-panel ul li[data-page="laporan"]');
+        var fallbackMenu = document.querySelector('.menu-panel ul li[data-page="laporan"]');
         if (fallbackMenu) fallbackMenu.classList.add('active');
     }
 
-    // 🔥 RENDER TAB YANG SESUAI
+    // RENDER TAB YANG SESUAI
     if (lastTab === 'laporan') {
         if (typeof renderLaporan === 'function') {
             renderLaporan();
@@ -116,29 +116,31 @@ function closeSaran() {
 
 // ==================== RESET SARAN FORM ====================
 function resetSaranForm() {
-    const msgEl = document.getElementById('saranMessage');
+    var msgEl = document.getElementById('saranMessage');
     if (msgEl) msgEl.value = '';
 }
 
 // ==================== INIT SARAN EVENTS ====================
 function initSaranEvents() {
-    const messageEl = document.getElementById('saranMessage');
-    const sendBtn = document.getElementById('saranSendBtn');
-    const closeBtn = document.getElementById('saranCloseBtn');
-    const toast = document.getElementById('toastMessage');
+    var messageEl = document.getElementById('saranMessage');
+    var sendBtn = document.getElementById('saranSendBtn');
+    var closeBtn = document.getElementById('saranCloseBtn');
+    var toast = document.getElementById('toastMessage');
 
     function showToastSaran(msg, isError) {
         isError = isError || false;
         toast.innerText = msg;
         toast.style.borderColor = isError ? '#ff4444' : '#a855f7';
         toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
+        setTimeout(function() {
+            toast.classList.remove('show');
+        }, 3000);
     }
 
     function sendSaran() {
         if (isSendingSaran) return;
 
-        const pesan = messageEl.value.trim();
+        var pesan = messageEl.value.trim();
 
         if (!pesan) {
             showToastSaran('⚠️ Pesan tidak boleh kosong!', true);
@@ -150,15 +152,15 @@ function initSaranEvents() {
         sendBtn.disabled = true;
         sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> MENGIRIM...';
 
-        const kategori = 'Saran';
-        const url = GAS_MAIL_URL + '?uid=' + encodeURIComponent(myUID) + '&ign=Member&msg=' + encodeURIComponent(pesan) + '&category=' + encodeURIComponent(kategori) + '&type=mail';
+        var kategori = 'Saran';
+        var url = GAS_MAIL_URL + '?uid=' + encodeURIComponent(myUID) + '&ign=Member&msg=' + encodeURIComponent(pesan) + '&category=' + encodeURIComponent(kategori) + '&type=mail';
 
         fetch(url)
-            .then(r => r.json())
-            .then(data => {
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
                 if (data.status === 'success') {
                     showToastSaran('✅ Surat berhasil dikirim! Terima kasih.');
-                    setTimeout(() => {
+                    setTimeout(function() {
                         resetSaranForm();
                         closeSaran();
                         sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> KIRIM SEKARANG';
@@ -172,7 +174,7 @@ function initSaranEvents() {
                     isSendingSaran = false;
                 }
             })
-            .catch(e => {
+            .catch(function(e) {
                 showToastSaran('🚨 Koneksi gagal! Coba lagi.', true);
                 sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> KIRIM SEKARANG';
                 sendBtn.disabled = false;
@@ -197,16 +199,15 @@ function initSaranEvents() {
 
 // ==================== RENDER SEGERA ====================
 function renderSegera() {
-    const mainContent = document.getElementById('mainContent');
+    var mainContent = document.getElementById('mainContent');
     if (!mainContent) return;
 
-    mainContent.innerHTML = `
-        <div class="segera-hadir">
-            <i class="fas fa-tools"></i>
-            <h2>Segera Hadir</h2>
-            <p>Fitur ini sedang dalam pengembangan</p>
-        </div>
-    `;
+    mainContent.innerHTML = '';
+    mainContent.innerHTML += '<div class="segera-hadir">';
+    mainContent.innerHTML += '  <i class="fas fa-tools"></i>';
+    mainContent.innerHTML += '  <h2>Segera Hadir</h2>';
+    mainContent.innerHTML += '  <p>Fitur ini sedang dalam pengembangan</p>';
+    mainContent.innerHTML += '</div>';
 }
 
 // ==================== EXPOSE ====================
