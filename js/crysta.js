@@ -565,8 +565,10 @@ function openCrystaDetail(crystaName) {
         }
     }
     
+    // 🔥 BADGE WARNA SESUAI TIPE
     var badgeText = isBase ? 'Crysta Dasar' : 'Crysta Penguat';
     var badgeClass = isBase ? 'crysta-detail-badge-base' : 'crysta-detail-badge';
+    var badgeColor = isBase ? 'var(--text-muted)' : typeInfo.text;
     
     var popupHTML = '';
     popupHTML += '<div class="crysta-detail-overlay" id="crystaDetailOverlay" onclick="if(event.target===this) closeCrystaDetail()">';
@@ -577,7 +579,7 @@ function openCrystaDetail(crystaName) {
     popupHTML += '    <div class="crysta-detail-header">';
     popupHTML += '      <div class="crysta-detail-icon">' + ci(item.type, isBase, 28) + '</div>';
     popupHTML += '      <div class="crysta-detail-name">' + escapeHtml(item.crysta_name) + '</div>';
-    popupHTML += '      <span class="' + badgeClass + '">' + badgeText + '</span>';
+    popupHTML += '      <span class="' + badgeClass + '" style="background:' + badgeColor + '22; color:' + badgeColor + ';">' + badgeText + '</span>';
     popupHTML += '    </div>';
     popupHTML += '    <div class="crysta-detail-body">';
     popupHTML += '      <div class="crysta-detail-stat">';
@@ -588,6 +590,12 @@ function openCrystaDetail(crystaName) {
     popupHTML += '</div>';
     
     document.body.insertAdjacentHTML('beforeend', popupHTML);
+    
+    // SET STATE POPUP TERBUKA UNTUK BACK BUTTON
+    if (window.setCrystaPopupOpen) {
+        window.setCrystaPopupOpen(true);
+    }
+    history.pushState({ crysta: true }, null, '#crysta');
 }
 
 function closeCrystaDetail() {
