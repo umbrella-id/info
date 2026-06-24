@@ -38,8 +38,8 @@
 }
 
 .crysta-header-icon-wrapper .crysta-svg-icon {
-    width: 36px !important;
-    height: 36px !important;
+    width: 28px !important;
+    height: 28px !important;
     filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.4));
 }
 
@@ -151,15 +151,13 @@
 }
 
 /* ==========================================
-   CARD - EFEK GLOW TERFOKUS (BORDER GLOW)
+   CARD - EFEK GLOW TERFOKUS (TANPA HOVER)
    ========================================== */
 .crysta-card {
     background: var(--bg-solid-form);
     border: 1px solid rgba(168, 85, 247, 0.15);
     border-radius: 12px;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-    /* 🔥 EFEK GLOW TERFOKUS - BORDER BERSINAR */
     box-shadow: 
         0 0 0 1px rgba(168, 85, 247, 0.05),
         0 0 20px rgba(168, 85, 247, 0.08),
@@ -170,15 +168,8 @@
     min-height: 0;
 }
 
-.crysta-card:hover {
-    transform: translateY(-3px);
-    border-color: rgba(168, 85, 247, 0.4);
-    box-shadow: 
-        0 0 0 2px rgba(168, 85, 247, 0.1),
-        0 0 30px rgba(168, 85, 247, 0.2),
-        0 0 60px rgba(168, 85, 247, 0.1),
-        0 8px 30px rgba(0, 0, 0, 0.3);
-}
+/* 🔥 HAPUS HOVER PADA CARD */
+/* .crysta-card:hover { ... } */
 
 .crysta-card-header {
     padding: 10px 12px;
@@ -480,8 +471,8 @@
     }
     
     .crysta-header-icon-wrapper .crysta-svg-icon {
-        width: 30px !important;
-        height: 30px !important;
+        width: 22px !important;
+        height: 22px !important;
     }
     
     .crysta-stats {
