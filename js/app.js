@@ -8,6 +8,7 @@ const menuClose = document.getElementById('menuClose');
 let lastActiveTab = 'laporan';
 let isSaranPopupOpen = false;
 let isDetailPopupOpen = false;
+let isCrystaPopupOpen = false; // 🔥 TAMBAHKAN
 
 function toggleMenu(open) {
     if (menuOverlay) menuOverlay.classList.toggle('open', open);
@@ -20,6 +21,18 @@ if (menuOverlay) menuOverlay.addEventListener('click', () => toggleMenu(false));
 
 // ==================== BACK BUTTON MANAGER ====================
 window.addEventListener('popstate', function(e) {
+    // 🔥 CEK POPUP CRYSTA
+    if (isCrystaPopupOpen) {
+        const popup = document.getElementById('crystaDetailOverlay');
+        if (popup) {
+            if (typeof closeCrystaDetail === 'function') {
+                closeCrystaDetail();
+                e.preventDefault();
+                return;
+            }
+        }
+    }
+    
     // CEK POPUP SARAN
     if (isSaranPopupOpen) {
         const popup = document.getElementById('saranPopupOverlay');
@@ -54,6 +67,11 @@ window.setDetailPopupOpen = function(open) {
     isDetailPopupOpen = open;
 };
 
+// 🔥 TAMBAHKAN
+window.setCrystaPopupOpen = function(open) {
+    isCrystaPopupOpen = open;
+};
+
 // ==================== RENDER MENU ====================
 function renderMenu() {
     var menuPanel = document.getElementById('menuPanel');
@@ -65,17 +83,29 @@ function renderMenu() {
     var items = ul.querySelectorAll('li');
     for (var i = 0; i < items.length; i++) {
         if (items[i].dataset.page === 'crysta') {
-            items[i].innerHTML = ciMenu(10) + ' Daftar Crysta';
+            // 🔥 CEK APAKAH ciMenu TERSEDIA
+            if (typeof ciMenu !== 'undefined') {
+                items[i].innerHTML = ciMenu(16) + ' Daftar Crysta';
+            } else {
+                items[i].innerHTML = '💎 Daftar Crysta';
+            }
             items[i].className = '';
             break;
         }
     }
 }
 
-// Panggil setelah DOM ready
-document.addEventListener('DOMContentLoaded', function() {
-    renderMenu();
-});
+// ==================== EXPOSE LAST ACTIVE TAB ====================
+window.lastActiveTab = lastActiveTab;
+
+window.setLastActiveTab = function(tab) {
+    lastActiveTab = tab;
+    window.lastActiveTab = tab;
+};
+
+window.getLastActiveTab = function() {
+    return lastActiveTab;
+};
 
 // ==================== NAVIGASI MENU ====================
 document.querySelectorAll('.menu-panel ul li').forEach(function(item) {
@@ -90,8 +120,7 @@ document.querySelectorAll('.menu-panel ul li').forEach(function(item) {
         // 🔥 SIMPAN TAB TERAKHIR (KECUALI SARAN)
         if (page !== 'saran') {
             lastActiveTab = page;
-            
-            // 🔥 UPDATE JUGA KE WINDOW
+            window.lastActiveTab = page;
             if (window.setLastActiveTab) {
                 window.setLastActiveTab(page);
             }
@@ -120,18 +149,19 @@ document.querySelectorAll('.menu-panel ul li').forEach(function(item) {
 // ==================== DEFAULT RENDER ====================
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 APP STARTED');
+    
+    // 🔥 SET DEFAULT
+    lastActiveTab = 'laporan';
+    window.lastActiveTab = 'laporan';
+    
+    // 🔥 RENDER MENU (PASTIKAN ciMenu TERSEDIA)
+    setTimeout(function() {
+        renderMenu();
+    }, 50);
+    
     if (typeof renderLaporan === 'function') {
         renderLaporan();
     } else if (typeof renderSegera === 'function') {
         renderSegera();
     }
 });
-
-// ==================== EXPOSE ====================
-window.lastActiveTab = lastActiveTab;
-window.setLastActiveTab = function(tab) {
-    lastActiveTab = tab;
-};
-window.getLastActiveTab = function() {
-    return lastActiveTab;
-};
