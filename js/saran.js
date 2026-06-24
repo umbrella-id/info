@@ -99,6 +99,10 @@ function closeSaran() {
         if (typeof renderLaporan === 'function') {
             renderLaporan();
         }
+    } else if (lastTab === 'crysta') {
+        if (typeof renderCrysta === 'function') {
+            renderCrysta();
+        }
     } else if (lastTab === 'segera') {
         if (typeof renderSegera === 'function') {
             renderSegera();
