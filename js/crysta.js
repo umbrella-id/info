@@ -26,7 +26,7 @@ var TYPE_OPTIONS = [
     { value: 'additional', label: 'Additional' },
     { value: 'special', label: 'Special' },
     { value: 'normal', label: 'Normal' }
-};
+];
 
 // ==================== CACHE ====================
 function getCrystaCache() {
@@ -61,8 +61,9 @@ function loadCrystaData(callback) {
         console.log('✅ CRYSTA: Load cache, jumlah:', cached.length);
         crystaRawData = cached;
         isDataLoaded = true;
-        isRendering = false;
-        renderCrysta();
+        setTimeout(function() {
+            renderCrysta();
+        }, 50);
         if (callback) callback();
     } else {
         console.log('⏳ CRYSTA: Tidak ada cache, tampilkan loading');
@@ -87,15 +88,17 @@ function loadCrystaData(callback) {
                 crystaRawData = data.data;
                 setCrystaCache(crystaRawData);
                 isDataLoaded = true;
-                isRendering = false;
-                renderCrysta();
+                setTimeout(function() {
+                    renderCrysta();
+                }, 50);
             } else {
                 console.warn('⚠️ CRYSTA: Data dari server kosong atau gagal');
                 if (!cached || cached.length === 0) {
                     crystaRawData = [];
                     isDataLoaded = true;
-                    isRendering = false;
-                    renderCrysta();
+                    setTimeout(function() {
+                        renderCrysta();
+                    }, 50);
                     if (callback) callback();
                 }
             }
@@ -105,8 +108,9 @@ function loadCrystaData(callback) {
             if (!cached || cached.length === 0) {
                 crystaRawData = [];
                 isDataLoaded = true;
-                isRendering = false;
-                renderCrysta();
+                setTimeout(function() {
+                    renderCrysta();
+                }, 50);
                 if (callback) callback();
             }
         });
@@ -246,11 +250,12 @@ function renderCrysta() {
     console.log('📊 isDataLoaded:', isDataLoaded);
     console.log('📊 crystaRawData.length:', crystaRawData.length);
     
-    if (isRendering) {
-        console.log('⏳ Already rendering, skip');
-        return;
-    }
-    isRendering = true;
+    // 🔥 HAPUS CEK isRendering AGAR BISA RENDER ULANG
+    // if (isRendering) {
+    //     console.log('⏳ Already rendering, skip');
+    //     return;
+    // }
+    // isRendering = true;
     
     // UPDATE LAST ACTIVE TAB
     if (window.setLastActiveTab) {
@@ -266,7 +271,6 @@ function renderCrysta() {
     var mainContent = document.getElementById('mainContent');
     if (!mainContent) {
         console.error('❌ mainContent NOT FOUND!');
-        isRendering = false;
         return;
     }
     console.log('✅ mainContent found');
@@ -274,8 +278,6 @@ function renderCrysta() {
     if (!isDataLoaded || crystaRawData.length === 0) {
         console.log('⏳ Data not ready, show loading');
         mainContent.innerHTML = '<div class="crysta-loading"><div class="spinner"></div><p>Memuat data crysta...</p></div>';
-        // 🔥 RESET FLAG SEBELUM LOAD ULANG
-        isRendering = false;
         loadCrystaData(function() {
             renderCrysta();
         });
@@ -422,7 +424,6 @@ function renderCrysta() {
     var gridContainer = document.getElementById('crystaGridContainer');
     if (!gridContainer) {
         console.error('❌ gridContainer NOT FOUND!');
-        isRendering = false;
         return;
     }
     console.log('✅ gridContainer found');
@@ -500,8 +501,6 @@ function renderCrysta() {
     console.log('📝 Setting gridContainer.innerHTML...');
     gridContainer.innerHTML = gridHtml;
     console.log('✅ renderCrysta() COMPLETE');
-    
-    isRendering = false;
 }
 
 // ==================== OPEN DETAIL POPUP ====================
