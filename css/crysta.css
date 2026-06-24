@@ -400,7 +400,7 @@
 
 .crysta-detail-badge-base {
     font-size: 11px;
-    background: rgba(136, 146, 176, 0.15);
+    background: rgba(136, 146, 176, 0.15); 
     color: var(--text-muted);
     padding: 2px 12px;
     border-radius: 12px;
