@@ -8,6 +8,7 @@ var isRendering = false;
 // ==================== KONFIGURASI ====================
 var CRYSTA_API_URL = 'https://script.google.com/macros/s/AKfycbzTP1-9KuQ2iz4ffTfhujqkSIQqQxXWMXY-BHljCVU_Zzm0Ept8j4AJUCBHqB-ZSZk/exec?action=getCrysta';
 var CRYSTA_CACHE_KEY = 'crysta_data';
+var CRYSTA_CACHE_EXPIRY = 24 * 60 * 60 * 1000;
 
 // ==================== TIPE WARNA & LABEL ====================
 var TYPE_COLORS = {
@@ -33,7 +34,7 @@ function getCrystaCache() {
         var raw = localStorage.getItem(CRYSTA_CACHE_KEY);
         if (!raw) return null;
         var data = JSON.parse(raw);
-        if (Date.now() - data.timestamp > CACHE_EXPIRY) {
+        if (Date.now() - data.timestamp > CRYSTA_CACHE_EXPIRY) {
             localStorage.removeItem(CRYSTA_CACHE_KEY);
             return null;
         }
@@ -52,7 +53,6 @@ function setCrystaCache(value) {
 
 // ==================== LOAD CRYSTA DATA ====================
 function loadCrystaData(callback) {
-    // 🔥 TAMPILKAN CACHE DULU (INSTANT)
     var cached = getCrystaCache();
     if (cached && cached.length > 0) {
         console.log('✅ CRYSTA: Load cache, jumlah:', cached.length);
@@ -63,7 +63,6 @@ function loadCrystaData(callback) {
         isDataLoaded = false;
     }
     
-    // 🔥 FETCH DATA BARU DI BACKGROUND (UPDATE)
     fetch(CRYSTA_API_URL)
         .then(function(r) { 
             if (!r.ok) throw new Error('HTTP ' + r.status); 
@@ -75,7 +74,6 @@ function loadCrystaData(callback) {
                 crystaRawData = data.data;
                 setCrystaCache(crystaRawData);
                 isDataLoaded = true;
-                // 🔥 RENDER ULANG DENGAN DATA BARU
                 if (typeof renderCrysta === 'function') {
                     renderCrysta();
                 }
@@ -224,7 +222,6 @@ function renderCrysta() {
     if (isRendering) return;
     isRendering = true;
     
-    // 🔥 UPDATE LAST ACTIVE TAB
     if (window.setLastActiveTab) {
         window.setLastActiveTab('crysta');
     }
@@ -385,7 +382,6 @@ function renderCrysta() {
         return;
     }
 
-    // 🔥 HITUNG BARIS MAKSIMAL
     var maxBodyLength = 0;
     for (var c = 0; c < cards.length; c++) {
         var bodyLen = cards[c].body.length;
@@ -394,10 +390,8 @@ function renderCrysta() {
         }
     }
     
-    // 🔥 MINIMAL 5 BARIS
     var targetRows = Math.max(maxBodyLength, 5);
     
-    // 🔥 TINGGI PER BARIS (perkiraan)
     var rowHeight = 20;
     var headerHeight = 42;
     var paddingHeight = 14;
@@ -423,7 +417,6 @@ function renderCrysta() {
             
             var isHeaderBase = isBaseNode(headerName);
             
-            // 🔥 HITUNG PADDING YANG DIBUTUHKAN
             var paddingNeeded = Math.max(0, targetRows - bodyItems.length);
             
             gridHtml += '    <div class="crysta-card" style="min-height:' + minCardHeight + 'px;">';
@@ -433,7 +426,6 @@ function renderCrysta() {
             gridHtml += '      </div>';
             gridHtml += '      <div class="crysta-card-body">';
             
-            // 🔥 TAMPILKAN BODY
             for (var b = 0; b < bodyItems.length; b++) {
                 var item = bodyItems[b];
                 var isItemBase = isBaseNode(item.crysta_name);
@@ -444,7 +436,6 @@ function renderCrysta() {
                 gridHtml += '        </div>';
             }
             
-            // 🔥 TAMBAHKAN PADDING KOSONG (INVISIBLE) UNTUK MERATAKAN TINGGI
             for (var p = 0; p < paddingNeeded; p++) {
                 gridHtml += '        <div class="crysta-level-item" style="visibility:hidden;height:20px;pointer-events:none;">';
                 gridHtml += '          <span class="crysta-level-icon" style="visibility:hidden;">&nbsp;</span>';
@@ -480,7 +471,6 @@ function openCrystaDetail(crystaName) {
     var isBase = isBaseNode(crystaName);
     var typeInfo = TYPE_COLORS[item.type] || TYPE_COLORS.normal;
     
-    // 🔥 FORMAT STAT - DETEKSI ANGKA NEGATIF / POSITIF / NETRAL
     var statLines = item.stat.split('\n');
     var formattedStat = '';
     for (var i = 0; i < statLines.length; i++) {
@@ -525,7 +515,6 @@ function openCrystaDetail(crystaName) {
         }
     }
     
-    // 🔥 BADGE: "Crysta Penguat" atau "Crysta Dasar"
     var badgeText = isBase ? 'Crysta Dasar' : 'Crysta Penguat';
     var badgeClass = isBase ? 'crysta-detail-badge-base' : 'crysta-detail-badge';
     
