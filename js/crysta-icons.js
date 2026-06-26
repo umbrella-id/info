@@ -27,7 +27,7 @@ var COLORS = {
     weapon:   { base: '#b91c1c', glow: '#ef4444' },
     armor:    { base: '#15803d', glow: '#22c55e' },
     additional: { base: '#bfbf00', glow: '#ffff00' },
-    special:  { base: '#b300b3', glow: '#ff66ff' },
+    special:  { base: '#b324b3', glow: '#ff66ff' },
     normal:   { base: '#1d4ed8', glow: '#3b82f6' }
 };
 
