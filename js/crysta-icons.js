@@ -26,8 +26,8 @@ function makeCrystaIcon16(glowColor, bodyColor, glowOpacity) {
 var COLORS = {
     weapon:   { base: '#b91c1c', glow: '#ef4444' },
     armor:    { base: '#15803d', glow: '#22c55e' },
-    additional: { base: '#bfae26', glow: '#ffe833' },
-    special:  { base: '#9926bf', glow: '#cc33ff' },
+    additional: { base: '#bfbf00', glow: '#ffff00' },
+    special:  { base: '#bf006f', glow: '#ff0095' },
     normal:   { base: '#1d4ed8', glow: '#3b82f6' }
 };
 
