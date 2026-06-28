@@ -8,8 +8,139 @@ const menuClose = document.getElementById('menuClose');
 let lastActiveTab = 'laporan';
 let isSaranPopupOpen = false;
 let isDetailPopupOpen = false;
-let isCrystaPopupOpen = false; // 🔥 TAMBAHKAN
+let isCrystaPopupOpen = false;
 
+// ==================== BUILD MENU ====================
+function buildMenu() {
+    const ul = document.querySelector('.menu-panel ul');
+    if (!ul) return;
+    
+    // 🔥 CEK APAKAH EVENT TERSEDIA (dari event.js)
+    const eventAvailable = window.isEventAvailable || false;
+    
+    let html = '';
+    
+    // EVENT - PERTAMA jika tersedia
+    if (eventAvailable) {
+        html += `
+            <li class="active" data-page="event">
+                <i class="fas fa-calendar-alt"></i> Event
+            </li>
+        `;
+    }
+    
+    // LAPORAN KAS
+    html += `
+        <li ${!eventAvailable ? 'class="active"' : ''} data-page="laporan">
+            <i class="fas fa-file-invoice"></i> Laporan Kas
+        </li>
+    `;
+    
+    // CRYSTA
+    html += `
+        <li data-page="crysta">
+            <span class="menu-icon-wrapper"></span>
+            Daftar Crysta
+        </li>
+    `;
+    
+    // SARAN
+    html += `
+        <li data-page="saran">
+            <i class="fas fa-envelope"></i> Kotak Saran
+        </li>
+    `;
+    
+    ul.innerHTML = html;
+    
+    // Render icon crysta di menu
+    const crystalLi = ul.querySelector('li[data-page="crysta"]');
+    if (crystalLi && typeof ciMenu !== 'undefined') {
+        const iconWrapper = crystalLi.querySelector('.menu-icon-wrapper');
+        if (iconWrapper) {
+            iconWrapper.innerHTML = ciMenu();
+        }
+    }
+    
+    // Attach event listener
+    attachMenuEvents();
+    
+    // Tentukan halaman default
+    let defaultPage = 'laporan';
+    if (eventAvailable) {
+        defaultPage = 'event';
+    }
+    
+    // Set active menu
+    const menuItems = document.querySelectorAll('.menu-panel ul li');
+    menuItems.forEach(function(item) {
+        item.classList.remove('active');
+        if (item.dataset.page === defaultPage) {
+            item.classList.add('active');
+        }
+    });
+    
+    // Navigasi ke halaman default
+    navigateToPage(defaultPage);
+}
+
+// ==================== ATTACH MENU EVENTS ====================
+function attachMenuEvents() {
+    document.querySelectorAll('.menu-panel ul li').forEach(function(item) {
+        item.addEventListener('click', function() {
+            document.querySelectorAll('.menu-panel ul li').forEach(function(i) {
+                i.classList.remove('active');
+            });
+            this.classList.add('active');
+            const page = this.dataset.page;
+            toggleMenu(false);
+
+            if (page !== 'saran') {
+                lastActiveTab = page;
+                window.lastActiveTab = page;
+                if (window.setLastActiveTab) {
+                    window.setLastActiveTab(page);
+                }
+            }
+
+            navigateToPage(page);
+        });
+    });
+}
+
+// ==================== NAVIGASI ====================
+function navigateToPage(page) {
+    if (page === 'event') {
+        if (typeof loadEventPage === 'function') {
+            loadEventPage();
+        } else {
+            // Fallback jika event.js belum load
+            const mainContent = document.getElementById('mainContent');
+            if (mainContent) {
+                mainContent.innerHTML = `
+                    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);gap:16px;">
+                        <i class="fas fa-spinner fa-spin" style="font-size:48px;color:var(--color-primary);"></i>
+                        <p>Memuat Event...</p>
+                    </div>
+                `;
+            }
+        }
+    } else if (page === 'laporan') {
+        if (typeof renderLaporan === 'function') {
+            renderLaporan();
+        }
+    } else if (page === 'crysta') {
+        if (typeof renderCrysta === 'function') {
+            renderCrysta();
+        }
+    } else if (page === 'saran') {
+        if (typeof renderSaran === 'function') {
+            renderSaran();
+        }
+    }
+}
+
+// ==================== TOGGLE MENU ====================
 function toggleMenu(open) {
     if (menuOverlay) menuOverlay.classList.toggle('open', open);
     if (menuPanel) menuPanel.classList.toggle('open', open);
@@ -21,7 +152,6 @@ if (menuOverlay) menuOverlay.addEventListener('click', () => toggleMenu(false));
 
 // ==================== BACK BUTTON MANAGER ====================
 window.addEventListener('popstate', function(e) {
-    // 🔥 CEK POPUP CRYSTA
     if (isCrystaPopupOpen) {
         const popup = document.getElementById('crystaDetailOverlay');
         if (popup) {
@@ -33,7 +163,6 @@ window.addEventListener('popstate', function(e) {
         }
     }
     
-    // CEK POPUP SARAN
     if (isSaranPopupOpen) {
         const popup = document.getElementById('saranPopupOverlay');
         if (popup && popup.style.display !== 'none') {
@@ -45,7 +174,6 @@ window.addEventListener('popstate', function(e) {
         }
     }
     
-    // CEK POPUP DETAIL HISTORY
     if (isDetailPopupOpen) {
         const popupOverlay = document.getElementById('popupOverlay');
         if (popupOverlay && popupOverlay.classList.contains('active')) {
@@ -58,7 +186,7 @@ window.addEventListener('popstate', function(e) {
     }
 });
 
-// ==================== EXPOSE BACK BUTTON STATE ====================
+// ==================== EXPOSE ====================
 window.setSaranPopupOpen = function(open) {
     isSaranPopupOpen = open;
 };
@@ -67,101 +195,36 @@ window.setDetailPopupOpen = function(open) {
     isDetailPopupOpen = open;
 };
 
-// 🔥 TAMBAHKAN
 window.setCrystaPopupOpen = function(open) {
     isCrystaPopupOpen = open;
 };
 
-// ==================== RENDER MENU ====================
-function renderMenu() {
-    var menuPanel = document.getElementById('menuPanel');
-    if (!menuPanel) return;
-    
-    var ul = menuPanel.querySelector('ul');
-    if (!ul) return;
-    
-    var items = ul.querySelectorAll('li');
-    for (var i = 0; i < items.length; i++) {
-        if (items[i].dataset.page === 'crysta') {
-            // 🔥 CEK APAKAH ciMenu TERSEDIA
-            if (typeof ciMenu !== 'undefined') {
-                items[i].innerHTML = ciMenu(16) + ' Daftar Crysta';
-            } else {
-                items[i].innerHTML = '💎 Daftar Crysta';
-            }
-            items[i].className = '';
-            break;
-        }
-    }
-}
-
-// ==================== EXPOSE LAST ACTIVE TAB ====================
 window.lastActiveTab = lastActiveTab;
-
 window.setLastActiveTab = function(tab) {
     lastActiveTab = tab;
     window.lastActiveTab = tab;
 };
-
 window.getLastActiveTab = function() {
     return lastActiveTab;
 };
+window.navigateToPage = navigateToPage;
+window.buildMenu = buildMenu;
 
-// ==================== NAVIGASI MENU ====================
-document.querySelectorAll('.menu-panel ul li').forEach(function(item) {
-    item.addEventListener('click', function() {
-        document.querySelectorAll('.menu-panel ul li').forEach(function(i) {
-            i.classList.remove('active');
-        });
-        this.classList.add('active');
-        const page = this.dataset.page;
-        toggleMenu(false);
-
-        // 🔥 SIMPAN TAB TERAKHIR (KECUALI SARAN)
-        if (page !== 'saran') {
-            lastActiveTab = page;
-            window.lastActiveTab = page;
-            if (window.setLastActiveTab) {
-                window.setLastActiveTab(page);
-            }
-        }
-
-        if (page === 'laporan') {
-            if (typeof renderLaporan === 'function') {
-                renderLaporan();
-            }
-        } else if (page === 'crysta') {
-            if (typeof renderCrysta === 'function') {
-                renderCrysta();
-            }
-        } else if (page === 'saran') {
-            if (typeof renderSaran === 'function') {
-                renderSaran();
-            }
-        } else if (page === 'segera') {
-            if (typeof renderSegera === 'function') {
-                renderSegera();
-            }
-        }
-    });
-});
-
-// ==================== DEFAULT RENDER ====================
+// ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 APP STARTED');
     
-    // 🔥 SET DEFAULT
-    lastActiveTab = 'laporan';
-    window.lastActiveTab = 'laporan';
+    // 🔥 Build menu (akan mengecek window.isEventAvailable dari event.js)
+    buildMenu();
     
-    // 🔥 RENDER MENU (PASTIKAN ciMenu TERSEDIA)
-    setTimeout(function() {
-        renderMenu();
-    }, 50);
-    
-    if (typeof renderLaporan === 'function') {
-        renderLaporan();
-    } else if (typeof renderSegera === 'function') {
-        renderSegera();
-    }
+    console.log('✅ APP initialized');
 });
+
+// ==================== SPIN ANIMATION ====================
+const styleSpin = document.createElement('style');
+styleSpin.textContent = `
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+`;
+document.head.appendChild(styleSpin);
