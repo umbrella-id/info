@@ -78,8 +78,18 @@ function closeSaran() {
         }
     }
 
-    // KEMBALI KE TAB SEBELUMNYA
+    // 🔥 AMBIL TAB SEBELUMNYA DARI lastActiveTab
     var lastTab = window.getLastActiveTab ? window.getLastActiveTab() : 'laporan';
+    
+    // 🔥 JIKA lastTab ADALAH 'saran', GUNAKAN FALLBACK
+    if (lastTab === 'saran') {
+        // Cek apakah event tersedia
+        if (window.isEventAvailable) {
+            lastTab = 'event';
+        } else {
+            lastTab = 'laporan';
+        }
+    }
     
     // UPDATE MENU AKTIF DI FLOATING PANEL
     var menuItems = document.querySelectorAll('.menu-panel ul li');
@@ -90,26 +100,35 @@ function closeSaran() {
     if (menuItem) {
         menuItem.classList.add('active');
     } else {
+        // Fallback: cari laporan atau event
         var fallbackMenu = document.querySelector('.menu-panel ul li[data-page="laporan"]');
+        if (!fallbackMenu && window.isEventAvailable) {
+            fallbackMenu = document.querySelector('.menu-panel ul li[data-page="event"]');
+        }
         if (fallbackMenu) fallbackMenu.classList.add('active');
+        if (fallbackMenu) lastTab = fallbackMenu.dataset.page;
     }
 
     // RENDER TAB YANG SESUAI
-    if (lastTab === 'laporan') {
-        if (typeof renderLaporan === 'function') {
-            renderLaporan();
-        }
-    } else if (lastTab === 'crysta') {
-        if (typeof renderCrysta === 'function') {
-            renderCrysta();
-        }
-    } else if (lastTab === 'segera') {
-        if (typeof renderSegera === 'function') {
-            renderSegera();
-        }
+    if (window.navigateToPage) {
+        window.navigateToPage(lastTab);
     } else {
-        if (typeof renderLaporan === 'function') {
-            renderLaporan();
+        if (lastTab === 'laporan') {
+            if (typeof renderLaporan === 'function') {
+                renderLaporan();
+            }
+        } else if (lastTab === 'crysta') {
+            if (typeof renderCrysta === 'function') {
+                renderCrysta();
+            }
+        } else if (lastTab === 'event') {
+            if (typeof window.loadEventPage === 'function') {
+                window.loadEventPage();
+            }
+        } else {
+            if (typeof renderLaporan === 'function') {
+                renderLaporan();
+            }
         }
     }
 }
@@ -197,21 +216,7 @@ function initSaranEvents() {
     console.log("✅ Kotak Saran terintegrasi");
 }
 
-// ==================== RENDER SEGERA ====================
-function renderSegera() {
-    var mainContent = document.getElementById('mainContent');
-    if (!mainContent) return;
-
-    mainContent.innerHTML = '';
-    mainContent.innerHTML += '<div class="segera-hadir">';
-    mainContent.innerHTML += '  <i class="fas fa-tools"></i>';
-    mainContent.innerHTML += '  <h2>Segera Hadir</h2>';
-    mainContent.innerHTML += '  <p>Fitur ini sedang dalam pengembangan</p>';
-    mainContent.innerHTML += '</div>';
-}
-
 // ==================== EXPOSE ====================
 window.renderSaran = renderSaran;
 window.closeSaran = closeSaran;
 window.resetSaranForm = resetSaranForm;
-window.renderSegera = renderSegera;
