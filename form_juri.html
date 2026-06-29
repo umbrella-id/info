@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Form Juri - Lomba Mancing Duo Hoki</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #0f0a1a;
+            color: #e2d9f3;
+            padding: 12px;
+            min-height: 100vh;
+        }
+        
+        .container { max-width: 480px; margin: 0 auto; padding-bottom: 30px; }
+        
+        .card {
+            background: #1a1228;
+            border-radius: 14px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            border: 1px solid #2d1f4a;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: #1a1228;
+            border-radius: 14px;
+            border: 1px solid #2d1f4a;
+            margin-bottom: 12px;
+        }
+        .header .logo { font-size: 18px; font-weight: 700; color: #c4b5e3; }
+        .header .logo span { color: #a78bfa; }
+        .header .counter { font-size: 12px; color: #7c6a9e; }
+        
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #c4b5e3;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .section-title .badge {
+            font-size: 11px;
+            font-weight: 400;
+            color: #7c6a9e;
+            background: #2d1f4a;
+            padding: 2px 10px;
+            border-radius: 12px;
+        }
+        .section-title .btn-back {
+            background: #2d1f4a;
+            color: #a78bfa;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .section-title .btn-back:active {
+            transform: scale(0.95);
+            background: #3d2a5a;
+        }
+        
+        .info-box {
+            background: #2d1f4a;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #a78bfa;
+            margin-bottom: 10px;
+        }
+        .info-box.warning { background: #4a2f1a; color: #fbbf24; }
+        .info-box.success { background: #064e3b; color: #6ee7b7; }
+        
+        .form-group { margin-bottom: 10px; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #a78bfa;
+            margin-bottom: 4px;
+        }
+        
+        /* ===== INPUT TEXT ===== */
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #2d1f4a;
+            border-radius: 10px;
+            font-size: 15px;
+            background: #0f0a1a;
+            color: #e2d9f3;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]::placeholder { color: #4a3a6a; }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #7c3aed;
+            background: #1a1228;
+        }
+        
+        /* ===== INPUT NUMBER ===== */
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #2d1f4a;
+            border-radius: 10px;
+            font-size: 15px;
+            background: #0f0a1a;
+            color: #e2d9f3;
+            transition: border-color 0.2s;
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"]::placeholder { color: #4a3a6a; }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #7c3aed;
+            background: #1a1228;
+        }
+        
+        /* ===== INPUT NUMBER DI TIM CARD ===== */
+        .tim-card input[type="number"] {
+            flex: 1;
+            min-width: 60px;
+            padding: 6px 10px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: 2px solid #2d1f4a;
+            background: #0f0a1a;
+            color: #e2d9f3;
+            transition: border-color 0.2s;
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        .tim-card input[type="number"]::-webkit-outer-spin-button,
+        .tim-card input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .tim-card input[type="number"]:focus {
+            outline: none;
+            border-color: #7c3aed;
+            background: #1a1228;
+        }
+        .tim-card input[type="number"].editing {
+            border-color: #f59e0b;
+            background: #1a1228;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            text-align: center;
+        }
+        .btn:active { transform: scale(0.97); }
+        
+        .btn-primary { background: #7c3aed; color: white; }
+        .btn-primary:active { background: #6d28d9; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:active { background: #059669; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:active { background: #dc2626; }
+        .btn-warning { background: #f59e0b; color: #1a1228; }
+        .btn-warning:active { background: #d97706; }
+        
+        .btn-gacha {
+            background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+            color: white;
+            font-size: 18px;
+            padding: 14px;
+            margin-top: 6px;
+        }
+        .btn-gacha:active { transform: scale(0.97); }
+        .btn-gacha.disabled { opacity: 0.4; pointer-events: none; }
+        
+        .btn-small {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #2d1f4a;
+            color: #a78bfa;
+        }
+        .btn-small:active { transform: scale(0.95); }
+        .btn-small.primary { background: #7c3aed; color: white; }
+        .btn-small.primary:active { background: #6d28d9; }
+        .btn-small.danger { background: #ef4444; color: white; }
+        .btn-small.danger:active { background: #dc2626; }
+        .btn-small.success { background: #10b981; color: white; }
+        .btn-small.success:active { background: #059669; }
+        .btn-small.warning { background: #f59e0b; color: #1a1228; }
+        .btn-small.warning:active { background: #d97706; }
+        
+        .flex-row {
+            display: flex;
+            gap: 8px;
+        }
+        .flex-row .btn { width: auto; }
+        .flex-row input { flex: 1; }
+        
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #2d1f4a;
+            font-size: 14px;
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item .delete-btn {
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 4px;
+            font-weight: 700;
+        }
+        .list-item .delete-btn:active { color: #dc2626; }
+        .list-item .badge-new {
+            background: #10b981;
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 4px;
+        }
+        
+        .tim-card {
+            background: #0f0a1a;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            border: 1px solid #2d1f4a;
+            transition: border-color 0.2s;
+        }
+        .tim-card.completed { border-color: #2d1f4a; }
+        .tim-card.has-admin { border-color: #2d1f4a; }
+        .tim-card.editing {
+            border-color: #f59e0b;
+            background: #1a1228;
+        }
+        
+        .tim-card .tim-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .tim-card .tim-anggota {
+            font-size: 12px;
+            color: #7c6a9e;
+        }
+        
+        .tim-card .tim-input {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .tim-card .detail-hasil {
+            margin-top: 6px;
+            font-size: 14px;
+            color: #c4b5e3;
+            background: #1a1228;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+        .tim-card .detail-hasil .label { color: #7c6a9e; }
+        .tim-card .detail-hasil .value { font-weight: 700; }
+        .tim-card .detail-hasil .value.selisih { color: #a78bfa; }
+        
+        .tim-card .tim-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+        
+        .hidden { display: none !important; }
+        .empty-state {
+            color: #4a3a6a;
+            text-align: center;
+            padding: 16px 0;
+            font-size: 14px;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2d1f4a;
+            color: #e2d9f3;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 999;
+            max-width: 90%;
+            text-align: center;
+            border: 1px solid #7c3aed;
+            animation: slideUp 0.3s ease;
+        }
+        .toast.success { border-color: #10b981; color: #6ee7b7; }
+        .toast.error { border-color: #ef4444; color: #fca5a5; }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        .pemenang {
+            text-align: center;
+            padding: 10px 0;
+        }
+        .pemenang .juara {
+            font-size: 24px;
+            font-weight: 800;
+            color: #f59e0b;
+        }
+        .pemenang .juara-2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #a78bfa;
+            margin-top: 8px;
+        }
+        .pemenang .detail {
+            font-size: 13px;
+            color: #7c6a9e;
+            margin-top: 4px;
+        }
+        .pemenang .trophy { font-size: 48px; margin-bottom: 8px; }
+        .pemenang .seri-text {
+            font-size: 16px;
+            color: #f59e0b;
+            font-weight: 700;
+        }
+        
+        .edit-badge {
+            font-size: 11px;
+            color: #f59e0b;
+            background: #1a1228;
+            padding: 2px 10px;
+            border-radius: 12px;
+            border: 1px solid #f59e0b;
+        }
+        
+        @media (max-width: 400px) {
+            .header .logo { font-size: 15px; }
+            .tim-card .tim-input input[type="number"] { min-width: 50px; font-size: 13px; }
+            .section-title .btn-back { font-size: 11px; padding: 3px 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="logo">🎣 <span>Form Juri</span></div>
+            <div class="counter" id="counterInfo">0 peserta</div>
+        </div>
+
+        <!-- STAGE 1: PENDAFTARAN -->
+        <div class="card" id="stagePendaftaran">
+            <div class="section-title">
+                <span>📝 Daftar Peserta</span>
+            </div>
+            <div id="infoPendaftaran" class="info-box">Masukkan nama peserta. Klik GACHA PASANGAN saat semua sudah terdaftar.</div>
+            <div class="form-group">
+                <label for="inputNama">Nama Peserta</label>
+                <div class="flex-row">
+                    <input type="text" id="inputNama" placeholder="Masukkan nama">
+                    <button class="btn btn-primary" onclick="tambahPeserta()" style="width:auto; padding:10px 16px;">Tambah</button>
+                </div>
+            </div>
+            <div id="listPeserta"><div class="empty-state">Belum ada peserta</div></div>
+            <button class="btn btn-gacha" id="btnGacha" onclick="gachaPairing()">🎰 GACHA PASANGAN</button>
+        </div>
+
+        <!-- STAGE 2: INPUT HASIL -->
+        <div class="card hidden" id="stageInputHasil">
+            <div class="section-title">
+                <span>📊 Hasil Pancing</span>
+                <span class="badge" id="timProgress">0/0 terisi</span>
+            </div>
+            <div id="infoPenjurian" class="info-box">Isi hasil pancing masing-masing tim. Klik Simpan untuk menyimpan.</div>
+            
+            <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #2d1f4a;">
+                <div style="font-size:13px; font-weight:600; color:#a78bfa; margin-bottom:6px;">➕ Peserta Tambahan</div>
+                <div class="flex-row">
+                    <input type="text" id="inputTelat" placeholder="Nama peserta tambahan">
+                    <button class="btn btn-success" onclick="tambahTelat()" style="width:auto; padding:10px 16px;">Tambah</button>
+                </div>
+            </div>
+            
+            <div id="listTim"><div class="empty-state">Belum ada tim</div></div>
+            
+            <button class="btn btn-gacha" id="btnHitung" onclick="hitungHasil()" style="margin-top:10px;">📊 HITUNG HASIL</button>
+            <div id="infoHitung" style="font-size:12px; color:#4a3a6a; margin-top:4px; text-align:center;"></div>
+        </div>
+
+        <!-- STAGE 3: PENILAIAN -->
+        <div class="card hidden" id="stagePenilaian">
+            <div class="section-title">
+                <span>🏆 Hasil Akhir</span>
+                <button class="btn-back" onclick="kembaliKeInputHasil()">⬅ Kembali</button>
+            </div>
+            <div id="pemenangContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===== CONFIG =====
+        var API_URL = 'https://script.google.com/macros/s/AKfycbyDskJFdamlC5pAoyW8SfLTVCQ2MQNm_cz1g3sbvTfYeQW4es1TwpH3C1J5YhnWf146/exec';
+        var pollingInterval = null;
+        var nilaiSementara = {};
+        var lastTimData = null;
+        var editingTimId = null;
+
+        // ===== DOM REFS =====
+        var $ = function(id) { return document.getElementById(id); };
+        var counterInfo = $('counterInfo');
+        var listPeserta = $('listPeserta');
+        var listTim = $('listTim');
+        var stagePendaftaran = $('stagePendaftaran');
+        var stageInputHasil = $('stageInputHasil');
+        var stagePenilaian = $('stagePenilaian');
+        var btnGacha = $('btnGacha');
+        var btnHitung = $('btnHitung');
+        var inputNama = $('inputNama');
+        var inputTelat = $('inputTelat');
+        var timProgress = $('timProgress');
+        var pemenangContainer = $('pemenangContainer');
+        var infoPendaftaran = $('infoPendaftaran');
+        var infoPenjurian = $('infoPenjurian');
+        var infoHitung = $('infoHitung');
+
+        // ===== TOAST =====
+        function showToast(msg, type) {
+            var old = document.querySelector('.toast');
+            if (old) old.remove();
+            var div = document.createElement('div');
+            div.className = 'toast ' + (type || '');
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(function() { div.remove(); }, 3000);
+        }
+
+        // ===== LOAD DATA =====
+        async function loadData() {
+            try {
+                var res = await fetch(API_URL + '?action=getData');
+                var result = await res.json();
+                if (result.status === 'success') {
+                    renderData(result.data);
+                }
+            } catch(e) {}
+        }
+
+        // ===== RENDER =====
+        function renderData(data) {
+            var pesertaCount = data.peserta ? data.peserta.length : 0;
+            var timCount = data.tim ? data.tim.length : 0;
+            counterInfo.textContent = pesertaCount + ' peserta | ' + timCount + ' tim';
+            
+            if (data.status === 'pendaftaran') {
+                stagePendaftaran.classList.remove('hidden');
+                stageInputHasil.classList.add('hidden');
+                stagePenilaian.classList.add('hidden');
+                btnGacha.disabled = false;
+                btnGacha.classList.remove('disabled');
+                infoPendaftaran.className = 'info-box';
+                infoPendaftaran.innerHTML = 'Masukkan nama peserta. Klik GACHA PASANGAN saat semua sudah terdaftar.';
+                renderPeserta(data.peserta || []);
+            } else if (data.status === 'penjurian') {
+                stagePendaftaran.classList.add('hidden');
+                stageInputHasil.classList.remove('hidden');
+                stagePenilaian.classList.add('hidden');
+                
+                renderTim(data.tim || []);
+                
+                var tims = data.tim || [];
+                var filled = 0;
+                for (var i = 0; i < tims.length; i++) {
+                    if (tims[i].terbesar !== null && tims[i].terkecil !== null) filled++;
+                }
+                timProgress.textContent = filled + '/' + tims.length + ' terisi';
+                
+                if (filled === tims.length && tims.length > 0) {
+                    btnHitung.disabled = false;
+                    btnHitung.classList.remove('disabled');
+                    infoHitung.textContent = '✅ Semua tim terisi. Klik tombol untuk melihat hasil.';
+                    infoHitung.style.color = '#6ee7b7';
+                } else {
+                    btnHitung.disabled = true;
+                    btnHitung.classList.add('disabled');
+                    infoHitung.textContent = '⏳ ' + (tims.length - filled) + ' tim belum diisi.';
+                    infoHitung.style.color = '#4a3a6a';
+                }
+                
+                var hasAdmin = false;
+                for (var j = 0; j < tims.length; j++) {
+                    if (tims[j].anggota && tims[j].anggota.indexOf('Admin') !== -1) {
+                        hasAdmin = true;
+                        break;
+                    }
+                }
+                if (hasAdmin) {
+                    infoPenjurian.className = 'info-box warning';
+                    infoPenjurian.innerHTML = '⚠️ Ada peserta yang belum memiliki pasangan.';
+                } else {
+                    infoPenjurian.className = 'info-box success';
+                    infoPenjurian.innerHTML = '✅ Semua peserta sudah memiliki pasangan.';
+                }
+            } else if (data.status === 'selesai') {
+                stagePendaftaran.classList.add('hidden');
+                stageInputHasil.classList.add('hidden');
+                stagePenilaian.classList.remove('hidden');
+                renderPemenang(data.tim || []);
+            }
+        }
+
+        function renderPeserta(peserta) {
+            if (!peserta || peserta.length === 0) {
+                listPeserta.innerHTML = '<div class="empty-state">Belum ada peserta</div>';
+                return;
+            }
+            var html = '';
+            peserta.forEach(function(nama, i) {
+                var escapedNama = nama.replace(/'/g, "\\'");
+                var isNew = i === 0 ? '<span class="badge-new">Baru</span>' : '';
+                html += '<div class="list-item">';
+                html += '<span>' + (i+1) + '. ' + nama + ' ' + isNew + '</span>';
+                html += '<span class="delete-btn" onclick="hapusPeserta(\'' + escapedNama + '\')">✕</span>';
+                html += '</div>';
+            });
+            listPeserta.innerHTML = html;
+        }
+
+        // ===== RENDER TIM =====
+        function renderTim(tim) {
+            if (!tim || tim.length === 0) {
+                listTim.innerHTML = '<div class="empty-state">Belum ada tim</div>';
+                return;
+            }
+
+            var currentTimKey = JSON.stringify(tim.map(function(t) {
+                return { id: t.id, anggota: t.anggota, terbesar: t.terbesar, terkecil: t.terkecil, selisih: t.selisih };
+            }));
+            
+            if (currentTimKey === lastTimData && editingTimId === null) {
+                tim.forEach(function(t) {
+                    var besarInput = document.getElementById('besar_' + t.id);
+                    var kecilInput = document.getElementById('kecil_' + t.id);
+                    if (besarInput && besarInput.dataset.manual !== 'true') {
+                        if (t.terbesar !== null && besarInput.value === '') {
+                            besarInput.value = t.terbesar;
+                        }
+                    }
+                    if (kecilInput && kecilInput.dataset.manual !== 'true') {
+                        if (t.terkecil !== null && kecilInput.value === '') {
+                            kecilInput.value = t.terkecil;
+                        }
+                    }
+                });
+                return;
+            }
+            lastTimData = currentTimKey;
+            
+            var html = '';
+            tim.forEach(function(t) {
+                var isComplete = t.terbesar !== null && t.terkecil !== null;
+                var isAdmin = t.anggota && t.anggota.indexOf('Admin') !== -1;
+                var anggotaText = t.anggota ? t.anggota.join(' & ') : '?';
+                var isEditing = (editingTimId === t.id);
+                
+                var cardClass = 'tim-card';
+                if (isComplete) cardClass += ' completed';
+                if (isAdmin) cardClass += ' has-admin';
+                if (isEditing) cardClass += ' editing';
+                
+                html += '<div class="' + cardClass + '">';
+                html += '<div class="tim-header">';
+                html += '<span>Tim #' + t.id + (isAdmin ? ' ⚠️' : '') + '</span>';
+                if (isEditing) {
+                    html += '<span class="edit-badge">✏️ Mengedit</span>';
+                } else {
+                    html += '<span style="font-size:12px; color:#7c6a9e;">' + (isComplete ? '✅ Selesai' : '⏳ Belum') + '</span>';
+                }
+                html += '</div>';
+                html += '<div class="tim-anggota">👥 ' + anggotaText + '</div>';
+                
+                var besarKey = 'besar_' + t.id;
+                var kecilKey = 'kecil_' + t.id;
+                var besarVal = isComplete && !isEditing ? t.terbesar : (nilaiSementara[besarKey] || (isComplete ? t.terbesar : ''));
+                var kecilVal = isComplete && !isEditing ? t.terkecil : (nilaiSementara[kecilKey] || (isComplete ? t.terkecil : ''));
+                
+                if (isComplete && !isEditing) {
+                    html += '<div class="detail-hasil">';
+                    html += '<span class="label">Terbesar:</span> <span class="value">' + t.terbesar + '</span> &nbsp;|&nbsp; ';
+                    html += '<span class="label">Terkecil:</span> <span class="value">' + t.terkecil + '</span> &nbsp;|&nbsp; ';
+                    html += '<span class="label">Selisih:</span> <span class="value selisih">' + (t.selisih || (t.terbesar - t.terkecil)) + '</span>';
+                    html += '</div>';
+                    html += '<div class="tim-actions">';
+                    html += '<button class="btn-small warning btn-edit-tim" data-tim-id="' + t.id + '">✏️ Koreksi</button>';
+                    html += '</div>';
+                } else {
+                    var inputClass = isEditing ? 'editing' : '';
+                    html += '<div class="tim-input">';
+                    html += '<input type="number" id="' + besarKey + '" placeholder="Terbesar" step="any" value="' + besarVal + '" class="' + inputClass + '" ';
+                    html += 'oninput="onInputChange(\'' + besarKey + '\', this.value)" ';
+                    html += 'data-manual="true" ';
+                    html += '>';
+                    html += '<input type="number" id="' + kecilKey + '" placeholder="Terkecil" step="any" value="' + kecilVal + '" class="' + inputClass + '" ';
+                    html += 'oninput="onInputChange(\'' + kecilKey + '\', this.value)" ';
+                    html += 'data-manual="true" ';
+                    html += '>';
+                    if (isEditing) {
+                        html += '<button class="btn-small success btn-simpan-edit" data-tim-id="' + t.id + '">💾 Update</button>';
+                        html += '<button class="btn-small danger btn-batal-edit">✕ Batal</button>';
+                    } else {
+                        html += '<button class="btn-small success btn-simpan-hasil" data-tim-id="' + t.id + '">💾 Simpan</button>';
+                    }
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+            });
+            listTim.innerHTML = html;
+        }
+
+        function renderPemenang(tim) {
+            if (!tim || tim.length === 0) {
+                pemenangContainer.innerHTML = '<div class="empty-state">Belum ada data</div>';
+                return;
+            }
+            var valid = tim.filter(function(t) { 
+                return t.terbesar !== null && t.terkecil !== null && t.selisih !== null;
+            });
+            if (valid.length === 0) {
+                pemenangContainer.innerHTML = '<div class="empty-state">Belum ada data lengkap</div>';
+                return;
+            }
+            valid.sort(function(a, b) { 
+                if (b.selisih !== a.selisih) return b.selisih - a.selisih;
+                return a.terkecil - b.terkecil;
+            });
+            
+            var groups = [];
+            var currentGroup = null;
+            valid.forEach(function(t) {
+                if (!currentGroup) {
+                    currentGroup = { selisih: t.selisih, terkecil: t.terkecil, tims: [t] };
+                } else if (t.selisih === currentGroup.selisih && t.terkecil === currentGroup.terkecil) {
+                    currentGroup.tims.push(t);
+                } else {
+                    groups.push(currentGroup);
+                    currentGroup = { selisih: t.selisih, terkecil: t.terkecil, tims: [t] };
+                }
+            });
+            if (currentGroup) groups.push(currentGroup);
+            
+            var isSeriJuara1 = false, isSeriJuara2 = false;
+            var juara1Group = null, juara2Group = null;
+            if (groups.length >= 1) {
+                var g1 = groups[0];
+                if (g1.tims.length > 1) {
+                    isSeriJuara1 = true;
+                } else {
+                    juara1Group = g1;
+                    if (groups.length >= 2) {
+                        var g2 = groups[1];
+                        if (g2.tims.length > 1) {
+                            isSeriJuara2 = true;
+                            juara2Group = g2;
+                        } else {
+                            juara2Group = g2;
+                        }
+                    }
+                }
+            }
+            
+            var html = '<div class="pemenang">';
+            if (isSeriJuara1) {
+                html += '<div class="trophy">⚖️</div>';
+                html += '<div class="seri-text">HASIL SERI</div>';
+                html += '<div class="detail">Tidak ada Juara 1 & 2 karena SERI di posisi teratas</div>';
+                html += '<div style="margin-top:8px; font-size:14px; color:#a78bfa;">Tim dengan data sama:</div>';
+                groups[0].tims.forEach(function(t) {
+                    html += '<div style="font-size:16px; font-weight:600; margin:4px 0;">' + (t.anggota ? t.anggota.join(' & ') : '') + '</div>';
+                });
+                html += '<div class="detail">Selisih: ' + groups[0].selisih + ' | Terkecil: ' + groups[0].terkecil + '</div>';
+            } else {
+                if (juara1Group) {
+                    html += '<div class="trophy">🏆</div>';
+                    html += '<div class="juara">🥇 Juara 1</div>';
+                    juara1Group.tims.forEach(function(t) {
+                        html += '<div style="font-size:20px; font-weight:700; margin:4px 0;">' + (t.anggota ? t.anggota.join(' & ') : '') + '</div>';
+                        html += '<div class="detail">Terbesar: ' + t.terbesar + ' | Terkecil: ' + t.terkecil + '</div>';
+                        html += '<div class="detail" style="font-weight:700; color:#a78bfa; font-size:18px;">Selisih: ' + t.selisih + '</div>';
+                    });
+                }
+                if (juara2Group) {
+                    html += '<div style="margin-top:16px; padding-top:16px; border-top:1px solid #2d1f4a;">';
+                    if (isSeriJuara2) {
+                        html += '<div class="juara-2">🥈 Juara 2 (SERI)</div>';
+                        html += '<div class="detail">⚖️ SERI antara ' + juara2Group.tims.length + ' tim</div>';
+                    } else {
+                        html += '<div class="juara-2">🥈 Juara 2</div>';
+                    }
+                    juara2Group.tims.forEach(function(t) {
+                        html += '<div style="font-size:18px; font-weight:600; margin:4px 0;">' + (t.anggota ? t.anggota.join(' & ') : '') + '</div>';
+                        html += '<div class="detail">Terbesar: ' + t.terbesar + ' | Terkecil: ' + t.terkecil + '</div>';
+                        html += '<div class="detail" style="font-weight:600; color:#a78bfa;">Selisih: ' + t.selisih + '</div>';
+                    });
+                    html += '</div>';
+                }
+            }
+            html += '<div style="margin-top:16px; padding-top:16px; border-top:1px solid #2d1f4a; text-align:left;">';
+            html += '<div style="font-weight:600; font-size:14px; color:#a78bfa; margin-bottom:8px;">📊 Semua Tim</div>';
+            groups.forEach(function(group, idx) {
+                var isSeri = group.tims.length > 1;
+                var label = '';
+                if (isSeriJuara1) label = '⚖️ SERI';
+                else if (idx === 0) label = '🥇 Juara 1';
+                else if (idx === 1) label = isSeri ? '🥈⚖️ Juara 2 (SERI)' : '🥈 Juara 2';
+                else label = (idx + 1) + '. Peringkat';
+                html += '<div style="padding:6px 0; border-bottom:1px solid #2d1f4a; font-size:13px;">';
+                html += '<div style="display:flex; justify-content:space-between; color:#c4b5e3;">';
+                html += '<span>' + label + '</span>';
+                html += '<span style="color:#7c6a9e;">Selisih: ' + group.selisih + ' | Terkecil: ' + group.terkecil + '</span>';
+                html += '</div>';
+                group.tims.forEach(function(t) {
+                    html += '<div style="color:#7c6a9e; font-size:12px; padding-left:12px;">';
+                    html += '👥 ' + (t.anggota ? t.anggota.join(' & ') : '');
+                    html += ' | ' + t.terbesar + ' - ' + t.terkecil;
+                    html += '</div>';
+                });
+                html += '</div>';
+            });
+            html += '</div></div>';
+            pemenangContainer.innerHTML = html;
+        }
+
+        // ===== INPUT HANDLER =====
+        function onInputChange(key, value) {
+            nilaiSementara[key] = value;
+        }
+
+        // ===== EVENT DELEGATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            listTim.addEventListener('click', function(e) {
+                var target = e.target.closest('.btn-edit-tim');
+                if (target) {
+                    var timId = parseInt(target.dataset.timId);
+                    if (timId) {
+                        mulaiEdit(timId);
+                    }
+                    return;
+                }
+                
+                target = e.target.closest('.btn-simpan-hasil');
+                if (target) {
+                    var timId = parseInt(target.dataset.timId);
+                    if (timId) {
+                        simpanHasil(timId);
+                    }
+                    return;
+                }
+                
+                target = e.target.closest('.btn-simpan-edit');
+                if (target) {
+                    var timId = parseInt(target.dataset.timId);
+                    if (timId) {
+                        simpanEdit(timId);
+                    }
+                    return;
+                }
+                
+                target = e.target.closest('.btn-batal-edit');
+                if (target) {
+                    batalEdit();
+                    return;
+                }
+            });
+        });
+
+        // ===== EDIT FUNCTIONS =====
+        function mulaiEdit(timId) {
+            if (editingTimId !== null) {
+                showToast('Sedang mengedit tim lain', 'error');
+                return;
+            }
+            
+            editingTimId = timId;
+            
+            fetch(API_URL + '?action=getData')
+                .then(function(res) { return res.json(); })
+                .then(function(result) {
+                    if (result.status === 'success') {
+                        var tim = result.data.tim.find(function(t) { return t.id === timId; });
+                        if (tim) {
+                            nilaiSementara['besar_' + timId] = tim.terbesar || '';
+                            nilaiSementara['kecil_' + timId] = tim.terkecil || '';
+                            lastTimData = null;
+                            loadData();
+                            setTimeout(function() {
+                                var input = document.getElementById('besar_' + timId);
+                                if (input) {
+                                    input.focus();
+                                    input.select();
+                                }
+                            }, 200);
+                        }
+                    }
+                })
+                .catch(function() {
+                    showToast('Gagal memuat data', 'error');
+                    editingTimId = null;
+                });
+        }
+
+        function batalEdit() {
+            if (editingTimId !== null) {
+                delete nilaiSementara['besar_' + editingTimId];
+                delete nilaiSementara['kecil_' + editingTimId];
+            }
+            editingTimId = null;
+            lastTimData = null;
+            loadData();
+        }
+
+        async function simpanEdit(timId) {
+            var besarInput = document.getElementById('besar_' + timId);
+            var kecilInput = document.getElementById('kecil_' + timId);
+            
+            if (!besarInput || !kecilInput) {
+                showToast('Input tidak ditemukan', 'error');
+                return;
+            }
+            
+            var terbesar = parseFloat(besarInput.value);
+            var terkecil = parseFloat(kecilInput.value);
+            
+            if (isNaN(terbesar) || isNaN(terkecil)) {
+                showToast('Isi kedua nilai dengan angka', 'error');
+                return;
+            }
+            if (terbesar <= terkecil) {
+                showToast('Terbesar harus > terkecil', 'error');
+                return;
+            }
+            
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'editHasil', 
+                        timId: timId, 
+                        terbesar: terbesar, 
+                        terkecil: terkecil 
+                    })
+                });
+                delete nilaiSementara['besar_' + timId];
+                delete nilaiSementara['kecil_' + timId];
+                editingTimId = null;
+                lastTimData = null;
+                showToast('✅ Data diupdate', 'success');
+                setTimeout(loadData, 500);
+            } catch(e) {
+                showToast('Gagal menyimpan', 'error');
+            }
+        }
+
+        // ===== SIMPAN HASIL =====
+        async function simpanHasil(timId) {
+            if (editingTimId !== null) {
+                showToast('Selesaikan edit terlebih dahulu', 'error');
+                return;
+            }
+            
+            var besarInput = document.getElementById('besar_' + timId);
+            var kecilInput = document.getElementById('kecil_' + timId);
+            
+            if (!besarInput || !kecilInput) {
+                showToast('Input tidak ditemukan', 'error');
+                return;
+            }
+            
+            var terbesar = parseFloat(besarInput.value);
+            var terkecil = parseFloat(kecilInput.value);
+            
+            if (isNaN(terbesar) || isNaN(terkecil)) {
+                showToast('Isi kedua nilai dengan angka', 'error');
+                return;
+            }
+            if (terbesar <= terkecil) {
+                showToast('Terbesar harus > terkecil', 'error');
+                return;
+            }
+            
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'inputHasil', 
+                        timId: timId, 
+                        terbesar: terbesar, 
+                        terkecil: terkecil 
+                    })
+                });
+                delete nilaiSementara['besar_' + timId];
+                delete nilaiSementara['kecil_' + timId];
+                lastTimData = null;
+                showToast('✅ Data tersimpan', 'success');
+                setTimeout(loadData, 500);
+            } catch(e) {
+                showToast('Gagal menyimpan', 'error');
+            }
+        }
+
+        // ===== ACTIONS LAIN =====
+        async function tambahPeserta() {
+            var nama = inputNama.value.trim();
+            if (!nama) { showToast('Masukkan nama', 'error'); return; }
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'tambahPeserta', nama: nama })
+                });
+                inputNama.value = '';
+                setTimeout(loadData, 500);
+            } catch(e) { showToast('Error', 'error'); }
+        }
+
+        async function hapusPeserta(nama) {
+            if (!confirm('Hapus "' + nama + '"?')) return;
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'hapusPeserta', nama: nama })
+                });
+                setTimeout(loadData, 500);
+            } catch(e) { showToast('Error', 'error'); }
+        }
+
+        async function tambahTelat() {
+            var nama = inputTelat.value.trim();
+            if (!nama) { showToast('Masukkan nama', 'error'); return; }
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'pesertaTelat', nama: nama })
+                });
+                inputTelat.value = '';
+                setTimeout(loadData, 500);
+            } catch(e) { showToast('Error', 'error'); }
+        }
+
+        async function gachaPairing() {
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'gachaPairing' })
+                });
+                nilaiSementara = {};
+                lastTimData = null;
+                setTimeout(loadData, 500);
+            } catch(e) { showToast('Error', 'error'); }
+        }
+
+        async function hitungHasil() {
+            try {
+                var res = await fetch(API_URL + '?action=getData');
+                var result = await res.json();
+                if (result.status !== 'success') {
+                    showToast('Gagal mengambil data', 'error');
+                    return;
+                }
+                var data = result.data;
+                var tims = data.tim || [];
+                var semuaTerisi = true;
+                for (var i = 0; i < tims.length; i++) {
+                    if (tims[i].terbesar === null || tims[i].terkecil === null) {
+                        semuaTerisi = false;
+                        break;
+                    }
+                }
+                if (!semuaTerisi || tims.length === 0) {
+                    showToast('Masih ada tim yang belum diisi!', 'error');
+                    return;
+                }
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'selesai' })
+                });
+                setTimeout(loadData, 500);
+            } catch(e) { showToast('Error', 'error'); }
+        }
+
+        async function kembaliKeInputHasil() {
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'kembaliKePenilaian' })
+                });
+                setTimeout(loadData, 500);
+            } catch(e) { showToast('Error', 'error'); }
+        }
+
+        // ===== KEYBOARD =====
+        inputNama.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); tambahPeserta(); }
+        });
+        inputTelat.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); tambahTelat(); }
+        });
+
+        // ===== POLLING =====
+        loadData();
+        pollingInterval = setInterval(loadData, 3000);
+    </script>
+</body>
+</html>
