@@ -15,12 +15,10 @@ function buildMenu() {
     const ul = document.querySelector('.menu-panel ul');
     if (!ul) return;
     
-    // 🔥 CEK APAKAH EVENT TERSEDIA (dari event.js)
     const eventAvailable = window.isEventAvailable || false;
     
     let html = '';
     
-    // EVENT - PERTAMA jika tersedia
     if (eventAvailable) {
         html += `
             <li class="active" data-page="event">
@@ -29,14 +27,12 @@ function buildMenu() {
         `;
     }
     
-    // LAPORAN KAS
     html += `
         <li ${!eventAvailable ? 'class="active"' : ''} data-page="laporan">
             <i class="fas fa-file-invoice"></i> Laporan Kas
         </li>
     `;
     
-    // CRYSTA
     html += `
         <li data-page="crysta">
             <span class="menu-icon-wrapper"></span>
@@ -44,7 +40,6 @@ function buildMenu() {
         </li>
     `;
     
-    // SARAN
     html += `
         <li data-page="saran">
             <i class="fas fa-envelope"></i> Kotak Saran
@@ -53,7 +48,6 @@ function buildMenu() {
     
     ul.innerHTML = html;
     
-    // Render icon crysta di menu
     const crystalLi = ul.querySelector('li[data-page="crysta"]');
     if (crystalLi && typeof ciMenu !== 'undefined') {
         const iconWrapper = crystalLi.querySelector('.menu-icon-wrapper');
@@ -62,16 +56,13 @@ function buildMenu() {
         }
     }
     
-    // Attach event listener
     attachMenuEvents();
     
-    // Tentukan halaman default
     let defaultPage = 'laporan';
     if (eventAvailable) {
         defaultPage = 'event';
     }
     
-    // Set active menu
     const menuItems = document.querySelectorAll('.menu-panel ul li');
     menuItems.forEach(function(item) {
         item.classList.remove('active');
@@ -80,7 +71,6 @@ function buildMenu() {
         }
     });
     
-    // Navigasi ke halaman default
     navigateToPage(defaultPage);
 }
 
@@ -108,22 +98,32 @@ function attachMenuEvents() {
     });
 }
 
-// ==================== NAVIGASI ====================
+// ==================== NAVIGASI (DIPERBAIKI) ====================
 function navigateToPage(page) {
+    const mainContent = document.getElementById('mainContent');
+    if (!mainContent) return;
+    
+    // 🔥 [FIX] Reset overflow dulu
+    mainContent.style.overflowY = '';
+    mainContent.style.height = '';
+    mainContent.style.maxHeight = '';
+    
+    // 🔥 [FIX] Jika halaman event, aktifkan scroll
+    if (page === 'event') {
+        mainContent.style.overflowY = 'auto';
+        mainContent.style.height = '100%';
+    }
+    
     if (page === 'event') {
         if (typeof loadEventPage === 'function') {
             loadEventPage();
         } else {
-            // Fallback jika event.js belum load
-            const mainContent = document.getElementById('mainContent');
-            if (mainContent) {
-                mainContent.innerHTML = `
-                    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);gap:16px;">
-                        <i class="fas fa-spinner fa-spin" style="font-size:48px;color:var(--color-primary);"></i>
-                        <p>Memuat Event...</p>
-                    </div>
-                `;
-            }
+            mainContent.innerHTML = `
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);gap:16px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size:48px;color:var(--color-primary);"></i>
+                    <p>Memuat Event...</p>
+                </div>
+            `;
         }
     } else if (page === 'laporan') {
         if (typeof renderLaporan === 'function') {
@@ -213,10 +213,7 @@ window.buildMenu = buildMenu;
 // ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 APP STARTED');
-    
-    // 🔥 Build menu (akan mengecek window.isEventAvailable dari event.js)
     buildMenu();
-    
     console.log('✅ APP initialized');
 });
 
